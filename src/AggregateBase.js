@@ -9,8 +9,6 @@ class AggregateBase {
         let id;
         let version;
         let uncommittedEvents = [];
-        let applyEventHandlers;
-        let commandHandlers;
 
         invariant(
             this.commandHandlers,
@@ -21,8 +19,7 @@ class AggregateBase {
             'An aggregateRoot requires applyEventHandlers'
         );
 
-        commandHandlers = Object.assign(this, this.commandHandlers);
-
+        Object.assign(this,  this.commandHandlers());
     }
 
     raiseEvent (event) {
