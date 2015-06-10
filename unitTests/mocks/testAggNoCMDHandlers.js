@@ -1,4 +1,4 @@
-var aggBase = require("../../src/AggregateBase");
+var aggBase = require("../../src/domain/AggregateBase");
 
 
 class TestAgg extends aggBase {

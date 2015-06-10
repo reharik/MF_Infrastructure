@@ -43,6 +43,25 @@ describe('aggregateFunctionality', function() {
         });
     });
 
+    describe('#CommandHandlers', function(){
+        context('when calling a commandHandler', ()=> {
+            it('should emit an event to the uncommited event collection and getuncommitedevents should work', function () {
+                mut.someCommand({'commandName':'someEvent', 'value':'some value'});
+                mut.getUncommittedEvents()[0].value.should.equal('some value');
+            })
+        });
+    });
+
+    describe('#CommandHandlers', function(){
+        context('when calling a clearUncommitedEvents', ()=> {
+            it('should clear events', function () {
+                mut.someCommand({'commandName':'someEvent', 'value':'some value'});
+                mut.clearUncommittedEvents();
+                mut.getUncommittedEvents().should.be.empty;
+            })
+        });
+    });
+
     after(function () {
         mockery.disable();
     });

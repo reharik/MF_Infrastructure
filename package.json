@@ -10,6 +10,8 @@
   "license": "MIT",
   "node": ">=0.12.0",
   "dependencies": {
+    "bluebird": "^2.9.27",
+    "ges-client": "^0.9.1",
     "invariant": "^2.1.0"
   },
   "devDependencies": {

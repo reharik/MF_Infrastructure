@@ -1,14 +1,19 @@
-var aggBase = require("../../src/AggregateBase");
+var aggBase = require("../../src/domain/AggregateBase");
 
 
 class TestAgg extends aggBase {
+    constructor(){
+        super();
+        //aggMixin(this, this.commandHandlers());
+    }
+
     commandHandlers() {
         return {
             'someCommand': function (command) {
-                this.raiseEvent({'eventName': 'someshite', 'values': 'moreshite'});
+                this.raiseEvent({'eventName': 'someshite', 'value': command.value});
             },
             'someOtherCommand': function (command) {
-                this.raiseEvent({'eventName': 'someOthershite', 'values': 'moreshite'});
+                this.raiseEvent({'eventName': 'someOthershite', 'value': command.value});
             }
         }
     }
