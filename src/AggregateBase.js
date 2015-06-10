@@ -9,8 +9,8 @@ class AggregateBase {
         let id;
         let version;
         let uncommittedEvents = [];
-        let _applyEventHandlers;
-        let _commandHandlers;
+        let applyEventHandlers;
+        let commandHandlers;
 
         invariant(
             this.commandHandlers,
@@ -21,14 +21,14 @@ class AggregateBase {
             'An aggregateRoot requires applyEventHandlers'
         );
 
-        commandHandlers = Object.assign(this, this._commandHandlers);
+        commandHandlers = Object.assign(this, this.commandHandlers);
 
     }
 
     raiseEvent (event) {
-        var key = Object.keys(this._applyEventHandlers).find(x=>x === event.eventName);
+        var key = Object.keys(this.applyEventHandlers).find(x=>x === event.eventName);
         if (key) {
-            this._applyEventHandlers[key](event);
+            this.applyEventHandlers[key](event);
         }
         this.uncommitedEvents.push(event);
     }
