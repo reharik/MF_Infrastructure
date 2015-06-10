@@ -3,7 +3,6 @@
 var should = require('chai').should();
 var mockery = require('mockery');
 var moduleUnderTest = require("./mocks/testAgg");
-var ConfigMock = require('./mocks/configMock');
 
 
 describe('aggregateFunctionality', function() {

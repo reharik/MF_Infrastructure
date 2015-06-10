@@ -23,3 +23,4 @@ class TestAgg extends aggBase {
 
     }
 }
+module.exports = TestAgg;

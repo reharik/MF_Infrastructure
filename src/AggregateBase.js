@@ -42,3 +42,5 @@ class AggregateBase {
     }
 
 }
+
+module.exports = AggregateBase;
