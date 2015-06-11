@@ -24,7 +24,6 @@ describe('getEventStoreRepository', function() {
     });
 
     beforeEach(function(){
-
     });
 
     describe('#getById', function() {
