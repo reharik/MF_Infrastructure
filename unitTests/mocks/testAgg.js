@@ -2,11 +2,8 @@ var aggBase = require("../../src/domain/AggregateBase");
 
 
 class TestAgg extends aggBase {
-    constructor(){
-        super();
-        //aggMixin(this, this.commandHandlers());
-    }
 
+    static aggregateName(){return 'TestAgg';}
     commandHandlers() {
         return {
             'someCommand': function (command) {
