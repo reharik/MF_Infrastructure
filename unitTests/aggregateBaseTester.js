@@ -7,13 +7,6 @@ var testAggNoEventHandlers = require("./mocks/testAggNoEventHandlers");
 
 describe('aggregateFunctionality', function() {
     var mut;
-    before(function(){
-        mockery.enable({
-            warnOnReplace: false,
-            warnOnUnregistered: false
-        });
-    });
-
     beforeEach(function(){
         mut = new testAgg();
     });
@@ -62,7 +55,4 @@ describe('aggregateFunctionality', function() {
         });
     });
 
-    after(function () {
-        mockery.disable();
-    });
 });

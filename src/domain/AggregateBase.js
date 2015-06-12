@@ -6,8 +6,8 @@ const invariant = require('invariant');
 
 class AggregateBase {
     constructor() {
-        this.id;
-        this.version;
+        this._id;
+        this._version=0;
         this.uncommittedEvents = [];
 
         invariant(
@@ -21,12 +21,20 @@ class AggregateBase {
 
         Object.assign(this,  this.commandHandlers());
     }
+    id(){return this._id};
+
+    version(){return this._version};
+
+    applyEvent(event){
+        var key = Object.keys(this.applyEventHandlers()).find(x=>x === event.eventName);
+        if (key) {
+            this.applyEventHandlers()[key](event);
+        }
+        this._version++;
+    }
 
     raiseEvent (event) {
-        var key = Object.keys(this.applyEventHandlers).find(x=>x === event.eventName);
-        if (key) {
-            this.applyEventHandlers[key](event);
-        }
+        this.applyEvent(event);
         this.uncommittedEvents.push(event);
     }
 

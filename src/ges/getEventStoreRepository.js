@@ -2,22 +2,25 @@
  * Created by rharik on 6/10/15.
  */
 
-var connection= require('./gesConnectionPromise');
+var ges= require('ges-client');
 var config = require('config');
 var invariant = require('invariant');
 var AggregateBase = require('./../domain/AggregateBase');
 var streamNameStrategy = require('./streamNameStrategy');
 var readStreamEventsForwardPromise = require('./readStreamEventsForwardPromise');
+var appendToStreamPromise = require('./appendToStreamPromise');
 var _ = require("lodash");
-var deserializeEvent = require('./deserializeEvent');
+var EventData = require('../models/EventData');
+
+
 
 module.exports = function (_options){
     var options = {
         eventTypeHeader:'eventTypeName',
         aggregateTypeHeader: 'aggregateTypeName',
         commitIdHeader: 'commitId',
-        writePageSize: 500,
-        readPageSize: 500
+        writePageSize: 2,
+        readPageSize: 1
     };
     _.assign(options, _options);
     invariant(
@@ -41,57 +44,100 @@ module.exports = function (_options){
         "repository requires a read size greater than 0"
     );
 
+    if(!options.esConn){
+        options.esConn = ges({ip: config.get('eventstore.ip'), tcp: 1113});
+    }
 
-    options.esConn = options.esConn ? options.esConn : connection({ip: config.get('eventstore.ip'), tcp: 1113}).then(function(conn){return conn;}, function(err){throw err;});
 
-
-    function getById(aggregateType, id, version){
-        console.log(readStreamEventsForwardPromise());
-        console.log(connection());
-
-        invariant(
-            aggregateType.prototype instanceof AggregateBase,
-            "aggregateType must inherit from AggregateBase"
-        );
-        invariant(
-            id.length === (36),
-            "id must be a valid uuid"
-        );
-        invariant(
-            (version <= 0),
-            "version number must be greater that 0"
-        );
-        var streamName =  streamNameStrategy(aggregateType.aggregateName(), id);
-        var aggregate = new aggregateType();
+    async function getById(aggregateType, id, version){
+        var streamName;
+        var aggregate;
         var sliceStart = 0;
         var currentSlice;
-        do {
-            // specify number of events to pull. if number of events too large for one call use limit
-            var sliceCount = sliceStart + options.readPageSize <= options.readPageSize ? options.readPageSize : version - sliceStart + 1;
-            // get all events, or first batch of events from GES
-            currentSlice = readStreamEventsForwardPromise(options.esConn, streamName, {start:sliceStart, count: sliceCount})
-                .then(function(result){return result;}, function(err){throw err;});
-            //validate
-            if (currentSlice.Status == 'StreamNotFound') {
-                throw new Error('Aggregate not found: ' + streamName);
-            }
-            //validate
-            if (currentSlice.Status == 'StreamDeleted') {
-                throw new Error('Aggregate Deleted: '+ streamName);
-            }
+        try{
+            invariant(
+                (aggregateType.prototype instanceof AggregateBase),
+                "aggregateType must inherit from AggregateBase"
+            );
+            invariant(
+                id.length === (36),
+                "id must be a valid uuid"
+            );
+            invariant(
+                (version >= 0),
+                "version number must be greater that 0"
+            );
 
-            sliceStart = currentSlice.NextEventNumber;
+            streamName =  streamNameStrategy(aggregateType.aggregateName(), id);
+            aggregate = new aggregateType();
+            do {
+                console.log("doing it");
+                // specify number of events to pull. if number of events too large for one call use limit
+                var sliceCount = sliceStart + options.readPageSize <= options.readPageSize ? options.readPageSize : version - sliceStart + 1;
+                // get all events, or first batch of events from GES
+                currentSlice = await readStreamEventsForwardPromise(options.esConn, streamName, {start:sliceStart, count: sliceCount});
 
-            currentSlice.Events.forEach(e=> aggregate.applyEvent(deserializeEvent(e.OrigionalEvent.Metadata, x.OriginalEvent.Data)));
+                //validate
+                if (currentSlice.Status == 'StreamNotFound') {
+                    throw new Error('Aggregate not found: ' + streamName);
+                }
+                //validate
+                if (currentSlice.Status == 'StreamDeleted') {
+                    throw new Error('Aggregate Deleted: '+ streamName);
+                }
 
-        } while (version >= currentSlice.NextEventNumber && !currentSlice.IsEndOfStream);
+                sliceStart = currentSlice.NextEventNumber;
+                currentSlice.Events.forEach(e=> aggregate.applyEvent(JSON.parse(e.Event.Data)));
+
+            } while (version >= currentSlice.NextEventNumber && !currentSlice.IsEndOfStream);
+        } catch (error){ throw(error); }
 
         return aggregate;
 
     }
 
+
+    async function save(aggregate, commitId, _metadata){
+        try {
+            invariant(
+                (aggregate.prototype instanceof AggregateBase),
+                "aggregateType must inherit from AggregateBase"
+            );
+
+            // standard data for metadata portion of persisted event
+            var metadata = {
+                // handy tracking id
+                commitIdHeader: commitId,
+                // type of aggregate being persisted
+                aggregateTypeHeader: aggregate.aggregateName()
+            };
+            // add extra data to metadata portion of presisted event
+            _.assign(metadata, _metadata);
+
+            streamName =  streamNameStrategy(aggregate.aggregateName(), aggregate.id);
+            newEvents = aggregate.getUncommittedEvents();
+
+            var originalVersion = aggregate.Version - newEvents.Count;
+            var expectedVersion = originalVersion == 0 ? ges.expectedVersion.emptyStream : originalVersion-1;
+
+            var events = newEvents.map(x=> new EventData(x.id, x.type, x, metadata));
+
+            var appendData = {
+                expectedVersion: expectedVersion,
+                events: events
+            };
+
+            var result = await appendToStreamPromise(options.esConn, streamName, appendData);
+
+            aggregate.clearUncommittedEvents();
+            //largely for testing purposes
+            return result;
+        }catch(error){ throw(error);}
+    }
+
     return {
-        getById : getById
+        getById : getById,
+        save : save
     }
 
 };
