@@ -1,10 +1,11 @@
-var aggBase = require("../../src/domain/AggregateBase");
+var aggBase = require("../../src/models/AggregateRootBase");
 
 
 class TestAgg extends aggBase {
     constructor(){
         super();
         this.eventsHandled =[];
+        this.type = 'TestAgg';
     }
     getEventsHandled(){return this.eventsHandled}
     clearEventsHandled(){return this.eventsHandled = []}

@@ -3,7 +3,7 @@
  */
 
 var should = require("chai").should();
-var mut = require('../src/ges/gesConnectionPromise');
+var mut = require('../src/ges/gesModules/gesConnectionPromise');
 var config = require('../Config/config');
 
 describe('gesConnectionPromise', function() {

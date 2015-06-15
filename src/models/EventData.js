@@ -3,7 +3,6 @@
  */
 
 module.exports = function EventData(eventId, type, data, metadata) {
-    isJson = !!isJson;
     metadata = metadata || {};
     data = JSON.stringify(data || {});
     metadata = JSON.stringify(metadata);

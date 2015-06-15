@@ -46,6 +46,8 @@ class AggregateBase {
         this.uncommittedEvents = [];
     }
 
+    isAggregateBase(){ return true; }
+
 }
 
 module.exports = AggregateBase;
