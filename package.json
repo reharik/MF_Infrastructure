@@ -35,6 +35,7 @@
     "gulp-util": "^3.0.4",
     "mocha": "^2.2.5",
     "mochawait": "^2.0.1",
-    "mockery": "^1.4.0"
+    "mockery": "^1.4.0",
+    "must": "^0.12.0"
   }
 }

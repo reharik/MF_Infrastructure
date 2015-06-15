@@ -41,7 +41,6 @@ module.exports = function (_options){
         options.readPageSize,
         "repository requires a read size greater than 0"
     );
-    console.log(gesPromise.readStreamEventForwardPromise);
     if(!options.esConn){
         options.esConn = ges({ip: config.get('eventstore.ip'), tcp: 1113});
     }
@@ -53,6 +52,7 @@ module.exports = function (_options){
         var sliceStart = 0;
         var currentSlice;
         var sliceCount;
+        console.log("version: "+version);
         try{
             invariant(
                 (aggregateType.prototype instanceof AggregateBase),
@@ -64,7 +64,7 @@ module.exports = function (_options){
             );
             invariant(
                 (version >= 0),
-                "version number must be greater that 0"
+                "version number must be greater than or equal to 0"
             );
 
             streamName =  streamNameStrategy(aggregateType.aggregateName(), id);
@@ -90,8 +90,10 @@ module.exports = function (_options){
                 currentSlice.Events.forEach(e=> aggregate.applyEvent(JSON.parse(e.Event.Data)));
 
             } while (version >= currentSlice.NextEventNumber && !currentSlice.IsEndOfStream);
-        } catch (error){                     console.log(error);
-            throw(error); }
+        } catch (error){
+            console.log(error);
+            throw(error);
+        }
 
         return aggregate;
 
@@ -126,8 +128,8 @@ module.exports = function (_options){
             streamName =  streamNameStrategy(aggregate.constructor.name, aggregate.id());
             newEvents = aggregate.getUncommittedEvents();
 
-            originalVersion = aggregate.version - newEvents.Count;
-            expectedVersion = originalVersion == 0 ? ges.expectedVersion.emptyStream : originalVersion-1;
+            originalVersion = aggregate.version() - newEvents.length;
+            expectedVersion = originalVersion == 0 ? -1 : originalVersion-1;
 
             events = newEvents.map(x=> new EventData(x.id, x.type, x, metadata));
 

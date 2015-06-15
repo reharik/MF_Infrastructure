@@ -2,9 +2,11 @@
  * Created by rharik on 6/10/15.
  */
 
-var chai =require("chai");
-var chaiAsPromised = require("chai-as-promised");
-var should = chai.should();
+//var chai =require("chai");
+//var chaiAsPromised = require("chai-as-promised");
+//var should = chai.should();
+//var expect = chai.expect();
+require('must');
 var mockery = require('mockery');
 var uuid = require('uuid');
 
@@ -13,12 +15,11 @@ var connection = require('./mocks/gesConnectionMock');
 var readStreamEventsForwardPromiseMock = require('./mocks/readStreamEventsForwardPromiseMock');
 var appendToStreamPromiseMock = require('./mocks/appendToStreamPromiseMock');
 var streamNameStrategy = require('../src/ges/strategies/streamNameStrategy');
-
-chai.use(chaiAsPromised);
+//chai.use(chaiAsPromised);
 
 var BadAgg = function(){};
 var badAgg = new BadAgg();
-var testAgg = new TestAgg();
+var testAgg;
 
 
 describe('getEventStoreRepository', function() {
@@ -34,31 +35,34 @@ describe('getEventStoreRepository', function() {
     });
 
     beforeEach(function(){
+        testAgg = new TestAgg();
     });
 
     describe('#getById', function() {
         context('when calling get by id with bad aggtype', function () {
-            it('should throw proper error', function () {
+            it('should throw proper error',  function () {
                 mut = require('../src/ges/gesRepository')();
-                mut.getById(badAgg,'','').should.be.rejectedWith('aggregateType must inherit from AggregateBase');
+
+                return mut.getById(BadAgg, uuid.v1(), '').must.reject.error(Error,"Invariant Violation: aggregateType must inherit from AggregateBase");
             })
         });
         context('when calling getById with bad uuid', function () {
             it('should throw proper error', function () {
                 mut = require('../src/ges/gesRepository')();
-                mut.getById(TestAgg,'some non uuid','').should.be.rejectedWith('id must be a valid uuid');
+                return mut.getById(TestAgg,'some non uuid','').must.reject.error(Error,"Invariant Violation: id must be a valid uuid");
             })
         });
         context('when calling getById with bad version', function (){
             it('should throw proper error', function () {
                 mut = require('../src/ges/gesRepository')();
-                mut.getById(TestAgg,uuid.v1(),0).should.be.rejectedWith('version number must be greater that 0');
+                return mut.getById(TestAgg,uuid.v1(),-6).must.reject.error(Error, "Invariant Violation: version number must be greater than or equal to 0");
+
             })
         });
         context('when calling getById with proper args',function (){
             it('should return proper agg', function () {
                 mut = require('../src/ges/gesRepository')();
-                mut.getById(TestAgg,uuid.v1(),0).should.eventually.equal(typeof TestAgg);
+                return mut.getById(TestAgg,uuid.v1(),0).must.resolve.instanceof(TestAgg);
             })
         });
         context('when calling getById with proper args but stream deleted', function (){
@@ -71,7 +75,7 @@ describe('getEventStoreRepository', function() {
                 };
                 mockery.registerMock('./gesPromise', {readStreamEventsForwardPromise: readStreamEventsForwardPromiseMock(result)} );
                 mut = require('../src/ges/gesRepository')();
-                mut.getById(TestAgg,uuid.v1(),0).should.be.rejectedWith('Aggregate Deleted: ');
+                return mut.getById(TestAgg,uuid.v1(),0).must.reject.error(Error, 'Aggregate Deleted: ');
             })
         });
         context('when calling getById with proper args but stream not found', function (){
@@ -84,7 +88,7 @@ describe('getEventStoreRepository', function() {
                 };
                 mockery.registerMock('./gesPromise', {readStreamEventsForwardPromise: readStreamEventsForwardPromiseMock(result)} );
                 mut = require('../src/ges/gesRepository')();
-                mut.getById(TestAgg,uuid.v1(),0).should.be.rejectedWith('Aggregate not found: ');
+                return mut.getById(TestAgg,uuid.v1(),0).must.reject.error(Error,'Aggregate not found: ');
             })
         });
 
@@ -92,16 +96,14 @@ describe('getEventStoreRepository', function() {
             it('should return apply all events and presumably loop', async function () {
                 mut = require('../src/ges/gesRepository')();
                 var agg =await mut.getById(TestAgg,uuid.v1(),0);
-                agg.getEventsHandled().length.should.equal(3);
+                agg.getEventsHandled().length.must.equal(3);
             })
         });
 
         context('when calling getById with multiple events returned',function (){
-            it('should set the agg version properly', async function () {
+            it('should set the agg version properly', function () {
                 mut = require('../src/ges/gesRepository')();
-                console.log(require('./gesPromise'));
-                var agg =await mut.getById(TestAgg,uuid.v1(),0);
-                agg._version.should.equal(3);
+                mut.getById(TestAgg,uuid.v1(),0)._version.must.equal(3);
             })
         });
 
@@ -110,7 +112,7 @@ describe('getEventStoreRepository', function() {
         context('when calling save with bad aggtype', function () {
             it('should throw proper error', function () {
                 mut = require('../src/ges/gesRepository')();
-                mut.save(badAgg,'','').should.be.rejectedWith('aggregateType must inherit from AggregateBase');
+                return mut.save(badAgg,'','').must.reject.error(Error, 'aggregateType must inherit from AggregateBase');
             })
         });
         context('when calling save with proper aggtype', function () {
@@ -121,7 +123,7 @@ describe('getEventStoreRepository', function() {
                 testAgg._id = uuid.v1();
                 mut = require('../src/ges/gesRepository')();
                 var result = await mut.save(testAgg, uuid.v1(), '');
-                result.streamName.should.equal(streamNameStrategy('TestAgg', testAgg._id,));
+                result.streamName.must.equal(streamNameStrategy('TestAgg', testAgg._id,));
             })
         });
         context('when calling save with proper aggtype', function () {
@@ -133,8 +135,7 @@ describe('getEventStoreRepository', function() {
                 //mockery.registerMock('./appendToStreamPromise', appendToStreamPromiseMock );
                 mut = require('../src/ges/gesRepository')();
                 var result = await mut.save(testAgg, uuid.v1(), '');
-                console.log(result.appendData.events);
-                result.appendData.events.length.should.equal(3);
+                result.appendData.events.length.must.equal(3);
             })
         });
         context('when calling save with proper aggtype', function () {
@@ -147,9 +148,9 @@ describe('getEventStoreRepository', function() {
                 var result = await mut.save(testAgg, commitId, '');
 
                 var metadata = result.appendData.events[0].Metadata;
-                console.log(metadata);
-                metadata['commitIdHeader'].should.equal(commitId);
-                metadata.aggregateTypeHeader.should.equal("TestAgg");
+                var parsed = JSON.parse(metadata);
+                parsed.commitIdHeader.should.equal(commitId);
+                parsed.aggregateTypeHeader.must.equal("TestAgg");
             })
         });
         context('when adding and altering metadata', function () {
@@ -161,8 +162,9 @@ describe('getEventStoreRepository', function() {
                 var commitId = uuid.v1();
                 var result = await mut.save(testAgg, commitId, {favoriteCheeze:'headcheeze',aggregateTypeHeader:'MF.TestAgg' });
                 var metadata = result.appendData.events[0].Metadata;
-                metadata.favoriteCheeze.should.equal("headcheeze");
-                metadata.aggregateTypeHeader.should.equal("MF.TestAgg");
+                var parsed = JSON.parse(metadata);
+                parsed.favoriteCheeze.must.equal("headcheeze");
+                parsed.aggregateTypeHeader.must.equal("MF.TestAgg");
             })
         });
         context('when calling save on new aggregate', function () {
@@ -174,8 +176,7 @@ describe('getEventStoreRepository', function() {
                 //mockery.registerMock('./appendToStreamPromise', appendToStreamPromiseMock );
                 mut = require('../src/ges/gesRepository')();
                 var result = await mut.save(testAgg, uuid.v1(), '');
-                console.log(result.appendData);
-                result.appendData.expectedVersion.should.equal(connection.expectedVersion.emptyStream);
+                result.appendData.expectedVersion.must.equal(-1);
             })
         });
 
@@ -189,7 +190,7 @@ describe('getEventStoreRepository', function() {
                 //mockery.registerMock('./appendToStreamPromise', appendToStreamPromiseMock );
                 mut = require('../src/ges/gesRepository')();
                 var result = await mut.save(testAgg, uuid.v1(), '');
-                result.appendData.expectedVersion.should.equal(5);
+                result.appendData.expectedVersion.must.equal(4);
             })
         });
 

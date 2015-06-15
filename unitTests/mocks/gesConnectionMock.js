@@ -3,9 +3,7 @@
  */
 
 module.exports = function(options) {
-
-    }
     return {"myconn":"conn",
-            expectedVersion:{emptyStream:0}
+            expectedVersion:{emptyStream:-1}
     };
 };
