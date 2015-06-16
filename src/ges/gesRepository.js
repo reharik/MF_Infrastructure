@@ -52,7 +52,6 @@ module.exports = function (_options){
         var sliceStart = 0;
         var currentSlice;
         var sliceCount;
-        console.log("version: "+version);
         try{
             invariant(
                 (aggregateType.prototype instanceof AggregateBase),
@@ -75,7 +74,6 @@ module.exports = function (_options){
                 // get all events, or first batch of events from GES
                 currentSlice = await gesPromise.readStreamEventsForwardPromise(options.esConn, streamName, {start:sliceStart, count: sliceCount});
                 //validate
-                console.log(currentSlice.Status);
                 if (currentSlice.Status == 'StreamNotFound') {
                     console.log(currentSlice.Status);
                     throw new Error('Aggregate not found: ' + streamName);

@@ -2,20 +2,17 @@
  * Created by rharik on 6/10/15.
  */
 
-//var chai =require("chai");
-//var chaiAsPromised = require("chai-as-promised");
-//var should = chai.should();
-//var expect = chai.expect();
+
 require('must');
 var mockery = require('mockery');
 var uuid = require('uuid');
 
 var TestAgg = require('./mocks/testAgg');
+var AggregateBase = require('./../src/models/AggregateRootBase');
 var connection = require('./mocks/gesConnectionMock');
 var readStreamEventsForwardPromiseMock = require('./mocks/readStreamEventsForwardPromiseMock');
 var appendToStreamPromiseMock = require('./mocks/appendToStreamPromiseMock');
 var streamNameStrategy = require('../src/ges/strategies/streamNameStrategy');
-//chai.use(chaiAsPromised);
 
 var BadAgg = function(){};
 var badAgg = new BadAgg();
@@ -29,6 +26,7 @@ describe('getEventStoreRepository', function() {
             warnOnReplace: false,
             warnOnUnregistered: false
         });
+        mockery.registerAllowable('../src/ges/gesRepository', true);
         mockery.registerMock('ges-client', connection);
         mockery.registerMock('./gesPromise', {readStreamEventsForwardPromise: readStreamEventsForwardPromiseMock(), appendToStreamPromise:appendToStreamPromiseMock} );
 
@@ -80,7 +78,6 @@ describe('getEventStoreRepository', function() {
                 byId._version.must.equal(3);
             })
         });
-
     });
 
 
@@ -110,7 +107,6 @@ describe('getEventStoreRepository', function() {
                 testAgg.raiseEvent({id:uuid.v1(), type:'someShite', variousProperties:"yeehaw"});
                 testAgg.raiseEvent({id:uuid.v1(), type:'someShite', variousProperties:"yeehaw"});
                 testAgg._id = uuid.v1();
-                //mockery.registerMock('./appendToStreamPromise', appendToStreamPromiseMock );
                 mut = require('../src/ges/gesRepository')();
                 var result = await mut.save(testAgg, uuid.v1(), '');
                 result.appendData.events.length.must.equal(3);
@@ -120,7 +116,6 @@ describe('getEventStoreRepository', function() {
             it('should add proper metadata to events', async function () {
                 testAgg.raiseEvent({id:uuid.v1(), type:'someShite', variousProperties:"yeehaw"});
                 testAgg._id = uuid.v1();
-                //mockery.registerMock('./appendToStreamPromise', appendToStreamPromiseMock );
                 mut = require('../src/ges/gesRepository')();
                 var commitId = uuid.v1();
                 var result = await mut.save(testAgg, commitId, '');
@@ -135,7 +130,6 @@ describe('getEventStoreRepository', function() {
             it('should result in proper metadata to events', async function () {
                 testAgg.raiseEvent({id:uuid.v1(), type:'someShite', variousProperties:"yeehaw"});
                 testAgg._id = uuid.v1();
-                //mockery.registerMock('./appendToStreamPromise', appendToStreamPromiseMock );
                 mut = require('../src/ges/gesRepository')();
                 var commitId = uuid.v1();
                 var result = await mut.save(testAgg, commitId, {favoriteCheeze:'headcheeze',aggregateTypeHeader:'MF.TestAgg' });
@@ -151,7 +145,6 @@ describe('getEventStoreRepository', function() {
                 testAgg.raiseEvent({id:uuid.v1(), type:'someShite', variousProperties:"yeehaw"});
                 testAgg.raiseEvent({id:uuid.v1(), type:'someShite', variousProperties:"yeehaw"});
                 testAgg._id = uuid.v1();
-                //mockery.registerMock('./appendToStreamPromise', appendToStreamPromiseMock );
                 mut = require('../src/ges/gesRepository')();
                 var result = await mut.save(testAgg, uuid.v1(), '');
                 result.appendData.expectedVersion.must.equal(-1);
@@ -165,7 +158,6 @@ describe('getEventStoreRepository', function() {
                 testAgg.raiseEvent({id:uuid.v1(), type:'someShite', variousProperties:"yeehaw"});
                 testAgg.raiseEvent({id:uuid.v1(), type:'someShite', variousProperties:"yeehaw"});
                 testAgg._id = uuid.v1();
-                //mockery.registerMock('./appendToStreamPromise', appendToStreamPromiseMock );
                 mut = require('../src/ges/gesRepository')();
                 var result = await mut.save(testAgg, uuid.v1(), '');
                 result.appendData.expectedVersion.must.equal(4);
@@ -174,16 +166,14 @@ describe('getEventStoreRepository', function() {
     });
 
     after(function () {
+        mockery.deregisterAll();
         mockery.disable();
     });
 });
 
 describe('getEventStoreRepository', function() {
     var mut;
-    var testAgg;
-/////////
-    // must clear mockery it seems to not be registering on 198
-    /////////
+
     before(function(){
         mockery.enable({
             warnOnReplace: false,
@@ -195,34 +185,35 @@ describe('getEventStoreRepository', function() {
             Events: [{}],
             IsEndOfStream: false
         };
+        mockery.registerAllowable('../src/ges/gesRepository', true);
         mockery.registerMock('ges-client', connection);
         mockery.registerMock('./gesPromise', {readStreamEventsForwardPromise: readStreamEventsForwardPromiseMock(result), appendToStreamPromise:appendToStreamPromiseMock} );
 
     });
 
     beforeEach(function(){
-        testAgg = new TestAgg();
     });
 
     describe('#getById_return bad results', function() {
         context('when calling getById with proper args but stream deleted', function (){
             it('should throw proper error', function () {
                 mut = require('../src/ges/gesRepository')();
-                var byId = mut.getById(TestAgg, uuid.v1(), 0);
-                console.log(byId);
-                return byId.must.reject.error(Error, 'Aggregate Deleted: ');
+                var id = uuid.v1();
+                var streamName = streamNameStrategy(TestAgg.aggregateName(),id);
+                var byId = mut.getById(TestAgg, id, 0);
+                return byId.must.reject.error(Error, 'Aggregate Deleted: '+streamName);
             })
         });
     });
 
     after(function () {
+        mockery.deregisterAll();
         mockery.disable();
     });
 });
 
 describe('getEventStoreRepository', function() {
     var mut;
-
     before(function(){
         mockery.enable({
             warnOnReplace: false,
@@ -234,13 +225,13 @@ describe('getEventStoreRepository', function() {
             Events: [{}],
             IsEndOfStream: false
         };
+        mockery.registerAllowable('../src/ges/gesRepository', true);
         mockery.registerMock('ges-client', connection);
         mockery.registerMock('./gesPromise', {readStreamEventsForwardPromise: readStreamEventsForwardPromiseMock(result), appendToStreamPromise:appendToStreamPromiseMock} );
 
     });
 
     beforeEach(function(){
-        testAgg = new TestAgg();
     });
 
     describe('#getById_return bad results', function() {
@@ -248,12 +239,17 @@ describe('getEventStoreRepository', function() {
             it('should throw proper error', function () {
 
                 mut = require('../src/ges/gesRepository')();
-                return mut.getById(TestAgg,uuid.v1(),0).must.reject.error(Error,'Aggregate not found: ');
+                var id = uuid.v1();
+                var streamName = streamNameStrategy(TestAgg.aggregateName(),id);
+                var byId = mut.getById(TestAgg, id, 0);
+                return byId.must.reject.error(Error, 'Aggregate not found: '+streamName);
+
             })
         });
     });
 
     after(function () {
+        mockery.deregisterAll();
         mockery.disable();
     });
 });

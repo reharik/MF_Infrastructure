@@ -5,7 +5,6 @@ var Promise = require('bluebird');
 
 module.exports = function (result){
     return function(conn, name, skipTake) {
-        console.log("result"+result);
         var data = JSON.stringify({eventName: "someEvent"});
         var newVar = !result ? {
             Status: 'OK',
