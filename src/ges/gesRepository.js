@@ -74,8 +74,8 @@ module.exports = function (_options){
                 sliceCount = sliceStart + options.readPageSize <= options.readPageSize ? options.readPageSize : version - sliceStart + 1;
                 // get all events, or first batch of events from GES
                 currentSlice = await gesPromise.readStreamEventsForwardPromise(options.esConn, streamName, {start:sliceStart, count: sliceCount});
-
                 //validate
+                console.log(currentSlice.Status);
                 if (currentSlice.Status == 'StreamNotFound') {
                     console.log(currentSlice.Status);
                     throw new Error('Aggregate not found: ' + streamName);

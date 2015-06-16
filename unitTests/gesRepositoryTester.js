@@ -65,33 +65,6 @@ describe('getEventStoreRepository', function() {
                 return mut.getById(TestAgg,uuid.v1(),0).must.resolve.instanceof(TestAgg);
             })
         });
-        context('when calling getById with proper args but stream deleted', function (){
-            it('should throw proper error', function () {
-                var result = {
-                    Status: 'StreamDeleted',
-                    NextEventNumber: 500,
-                    Events: [{}],
-                    IsEndOfStream: false
-                };
-                mockery.registerMock('./gesPromise', {readStreamEventsForwardPromise: readStreamEventsForwardPromiseMock(result)} );
-                mut = require('../src/ges/gesRepository')();
-                return mut.getById(TestAgg,uuid.v1(),0).must.reject.error(Error, 'Aggregate Deleted: ');
-            })
-        });
-        context('when calling getById with proper args but stream not found', function (){
-            it('should throw proper error', function () {
-                var result = {
-                    Status: 'StreamNotFound',
-                    NextEventNumber: 500,
-                    Events: [{}],
-                    IsEndOfStream: false
-                };
-                mockery.registerMock('./gesPromise', {readStreamEventsForwardPromise: readStreamEventsForwardPromiseMock(result)} );
-                mut = require('../src/ges/gesRepository')();
-                return mut.getById(TestAgg,uuid.v1(),0).must.reject.error(Error,'Aggregate not found: ');
-            })
-        });
-
         context('when calling getById with multiple events returned',function (){
             it('should return apply all events and presumably loop', async function () {
                 mut = require('../src/ges/gesRepository')();
@@ -101,18 +74,23 @@ describe('getEventStoreRepository', function() {
         });
 
         context('when calling getById with multiple events returned',function (){
-            it('should set the agg version properly', function () {
+            it('should set the agg version properly', async function () {
                 mut = require('../src/ges/gesRepository')();
-                mut.getById(TestAgg,uuid.v1(),0)._version.must.equal(3);
+                var byId = await mut.getById(TestAgg, uuid.v1(), 0);
+                byId._version.must.equal(3);
             })
         });
 
     });
+
+
+
+
     describe('#save', function() {
         context('when calling save with bad aggtype', function () {
             it('should throw proper error', function () {
                 mut = require('../src/ges/gesRepository')();
-                return mut.save(badAgg,'','').must.reject.error(Error, 'aggregateType must inherit from AggregateBase');
+                return mut.save(badAgg,'','').must.reject.error(Error, 'Invariant Violation: aggregateType must inherit from AggregateBase');
             })
         });
         context('when calling save with proper aggtype', function () {
@@ -193,10 +171,6 @@ describe('getEventStoreRepository', function() {
                 result.appendData.expectedVersion.must.equal(4);
             })
         });
-
-
-
-
     });
 
     after(function () {
@@ -204,3 +178,82 @@ describe('getEventStoreRepository', function() {
     });
 });
 
+describe('getEventStoreRepository', function() {
+    var mut;
+    var testAgg;
+/////////
+    // must clear mockery it seems to not be registering on 198
+    /////////
+    before(function(){
+        mockery.enable({
+            warnOnReplace: false,
+            warnOnUnregistered: false
+        });
+        var result = {
+            Status: 'StreamDeleted',
+            NextEventNumber: 500,
+            Events: [{}],
+            IsEndOfStream: false
+        };
+        mockery.registerMock('ges-client', connection);
+        mockery.registerMock('./gesPromise', {readStreamEventsForwardPromise: readStreamEventsForwardPromiseMock(result), appendToStreamPromise:appendToStreamPromiseMock} );
+
+    });
+
+    beforeEach(function(){
+        testAgg = new TestAgg();
+    });
+
+    describe('#getById_return bad results', function() {
+        context('when calling getById with proper args but stream deleted', function (){
+            it('should throw proper error', function () {
+                mut = require('../src/ges/gesRepository')();
+                var byId = mut.getById(TestAgg, uuid.v1(), 0);
+                console.log(byId);
+                return byId.must.reject.error(Error, 'Aggregate Deleted: ');
+            })
+        });
+    });
+
+    after(function () {
+        mockery.disable();
+    });
+});
+
+describe('getEventStoreRepository', function() {
+    var mut;
+
+    before(function(){
+        mockery.enable({
+            warnOnReplace: false,
+            warnOnUnregistered: false
+        });
+        var result = {
+            Status: 'StreamNotFound',
+            NextEventNumber: 500,
+            Events: [{}],
+            IsEndOfStream: false
+        };
+        mockery.registerMock('ges-client', connection);
+        mockery.registerMock('./gesPromise', {readStreamEventsForwardPromise: readStreamEventsForwardPromiseMock(result), appendToStreamPromise:appendToStreamPromiseMock} );
+
+    });
+
+    beforeEach(function(){
+        testAgg = new TestAgg();
+    });
+
+    describe('#getById_return bad results', function() {
+        context('when calling getById with proper args but stream not found', function (){
+            it('should throw proper error', function () {
+
+                mut = require('../src/ges/gesRepository')();
+                return mut.getById(TestAgg,uuid.v1(),0).must.reject.error(Error,'Aggregate not found: ');
+            })
+        });
+    });
+
+    after(function () {
+        mockery.disable();
+    });
+});
