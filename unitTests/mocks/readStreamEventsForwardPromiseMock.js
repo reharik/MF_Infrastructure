@@ -3,15 +3,17 @@
  */
 var Promise = require('bluebird');
 
-module.exports = function (result){
-    return function(conn, name, skipTake) {
-        var data = JSON.stringify({eventName: "someEvent"});
-        var newVar = !result ? {
-            Status: 'OK',
-            NextEventNumber:3,
-            Events: [{Event:{EventName:'someEvent',Data: data}},{Event:{EventName:'someEvent',Data: data}},{Event:{EventName:'someEvent',Data: data}}],
-            IsEndOfStream: false
-        } : result;
-        return Promise.resolve(newVar);
-    }
+var data = JSON.stringify({eventName: "someEvent"});
+var _result = {
+    Status: 'OK',
+    NextEventNumber:3,
+    Events: [{Event:{EventName:'someEvent',Data: data}},{Event:{EventName:'someEvent',Data: data}},{Event:{EventName:'someEvent',Data: data}}],
+    IsEndOfStream: false
+};
+
+module.exports = {
+    setResult :function (result){_result = result;},
+    mock: function(conn, name, skipTake) {
+            return Promise.resolve(_result);
+        }
 };
