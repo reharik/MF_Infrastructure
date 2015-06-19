@@ -4,12 +4,9 @@
 
 var Promise = require('bluebird');
 var invariant = require('invariant');
+var gesConnection = require('gesConnection');
 
- module.exposes = function(connection, streamName, data){
-     invariant(
-        connection,
-        'must pass a valid connection'
-     );
+ module.exposes = function(streamName, data){
      invariant(
          streamName,
          'must pass a valid stream name'
@@ -24,7 +21,7 @@ var invariant = require('invariant');
      );
 
      return new Promise(function(resolve,reject){
-        connection.appendToStream(streamName, data, function(err, result) {
+        gesConnection.appendToStream(streamName, data, function(err, result) {
             if (err) {
                 reject(err);
             } else {

@@ -2,8 +2,6 @@
  * Created by rharik on 6/10/15.
  */
 
-var ges= require('ges-client');
-var config = require('config');
 var invariant = require('invariant');
 var AggregateBase = require('./../models/AggregateRootBase');
 var _ = require("lodash");
@@ -72,7 +70,7 @@ module.exports = function (_options){
                 // specify number of events to pull. if number of events too large for one call use limit
                 sliceCount = sliceStart + options.readPageSize <= options.readPageSize ? options.readPageSize : version - sliceStart + 1;
                 // get all events, or first batch of events from GES
-                currentSlice = await gesPromise.readStreamEventsForwardPromise(options.esConn, streamName, {start:sliceStart, count: sliceCount});
+                currentSlice = await gesPromise.readStreamEventsForwardPromise(streamName, {start:sliceStart, count: sliceCount});
                 //validate
                 if (currentSlice.Status == 'StreamNotFound') {
                     console.log(currentSlice.Status);
@@ -135,7 +133,7 @@ module.exports = function (_options){
                 expectedVersion: expectedVersion,
                 events: events
             };
-            result = await gesPromise.appendToStreamPromise(options.esConn, streamName, appendData);
+            result = await gesPromise.appendToStreamPromise(streamName, appendData);
 
             aggregate.clearUncommittedEvents();
             //largely for testing purposes

@@ -3,12 +3,10 @@
  */
 var Promise = require('bluebird');
 var invariant = require('invariant');
+var gesConnection = require('gesConnection');
 
-module.exports = function(connection, streamName, skipTake){
-    invariant(
-        connection,
-        'must pass a valid connection'
-    );
+
+module.exports = function(streamName, skipTake){
     invariant(
         streamName,
         'must pass a valid stream name'
@@ -19,7 +17,7 @@ module.exports = function(connection, streamName, skipTake){
     );
 
     return new Promise(function(resolve, reject){
-        connection.ReadStreamEventsForward(streamName, skipTake ,function(err, results) {
+        gesConnection.ReadStreamEventsForward(streamName, skipTake ,function(err, results) {
             if(err){
                 reject(err);
             }else{
