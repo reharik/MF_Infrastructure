@@ -6,7 +6,8 @@ var invariant = require('invariant');
 var AggregateBase = require('./../models/AggregateRootBase');
 var _ = require("lodash");
 var EventData = require('../models/EventData');
-var gesPromise = require('./gesPromise');
+var appendToStreamPromise = require('./appendToStreamPromise');
+var readStreamEventsForwardPromise = require('./readStreamEventsForwardPromise');
 var streamNameStrategy = require('./strategies/streamNameStrategy');
 
 
@@ -39,10 +40,6 @@ module.exports = function (_options){
         options.readPageSize,
         "repository requires a read size greater than 0"
     );
-    if(!options.esConn){
-        options.esConn = ges({ip: config.get('eventstore.ip'), tcp: 1113});
-    }
-
 
     async function getById(aggregateType, id, version){
         var streamName;
@@ -70,15 +67,13 @@ module.exports = function (_options){
                 // specify number of events to pull. if number of events too large for one call use limit
                 sliceCount = sliceStart + options.readPageSize <= options.readPageSize ? options.readPageSize : version - sliceStart + 1;
                 // get all events, or first batch of events from GES
-                currentSlice = await gesPromise.readStreamEventsForwardPromise(streamName, {start:sliceStart, count: sliceCount});
+                currentSlice = await readStreamEventsForwardPromise(streamName, {start:sliceStart, count: sliceCount});
                 //validate
                 if (currentSlice.Status == 'StreamNotFound') {
-                    console.log(currentSlice.Status);
                     throw new Error('Aggregate not found: ' + streamName);
                 }
                 //validate
                 if (currentSlice.Status == 'StreamDeleted') {
-                    console.log(currentSlice.Status);
                     throw new Error('Aggregate Deleted: '+ streamName);
                 }
 
@@ -133,7 +128,7 @@ module.exports = function (_options){
                 expectedVersion: expectedVersion,
                 events: events
             };
-            result = await gesPromise.appendToStreamPromise(streamName, appendData);
+            result = await appendToStreamPromise(streamName, appendData);
 
             aggregate.clearUncommittedEvents();
             //largely for testing purposes

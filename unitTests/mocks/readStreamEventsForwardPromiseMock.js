@@ -2,8 +2,8 @@
  * Created by reharik on 6/10/15.
  */
 var Promise = require('bluebird');
-
-var data = JSON.stringify({eventName: "someEvent"});
+var Vent = require('../../src/models/gesEvent');
+var data = JSON.stringify(new Vent('someEvent',null,null,{blah:'blah'}));
 var _result = {
     Status: 'OK',
     NextEventNumber:3,

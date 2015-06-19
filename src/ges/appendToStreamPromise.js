@@ -4,9 +4,9 @@
 
 var Promise = require('bluebird');
 var invariant = require('invariant');
-var gesConnection = require('gesConnection');
+var gesConnection = require('./gesConnection');
 
- module.exposes = function(streamName, data){
+ module.exports = function(streamName, data){
      invariant(
          streamName,
          'must pass a valid stream name'

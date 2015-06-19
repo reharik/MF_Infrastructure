@@ -2,17 +2,16 @@
  * Created by rharik on 6/10/15.
  */
 
-
 require('must');
 var mockery = require('mockery');
 var uuid = require('uuid');
 
 var TestAgg = require('./mocks/testAgg');
 var AggregateBase = require('./../src/models/AggregateRootBase');
-var connection = require('./mocks/gesConnectionMock');
 var readStreamEventsForwardPromiseMock = require('./mocks/readStreamEventsForwardPromiseMock');
 var appendToStreamPromiseMock = require('./mocks/appendToStreamPromiseMock');
 var streamNameStrategy = require('../src/ges/strategies/streamNameStrategy');
+var Vent = require('../src/models/gesEvent');
 
 var BadAgg = function(){};
 var badAgg = new BadAgg();
@@ -26,8 +25,8 @@ describe('getEventStoreRepository', function() {
             warnOnReplace: false,
             warnOnUnregistered: false
         });
-        mockery.registerMock('ges-client', connection);
-        mockery.registerMock('./gesPromise', {readStreamEventsForwardPromise: readStreamEventsForwardPromiseMock.mock, appendToStreamPromise:appendToStreamPromiseMock} );
+        mockery.registerMock('./appendToStreamPromise',appendToStreamPromiseMock.mock);
+        mockery.registerMock('./readStreamEventsForwardPromise',readStreamEventsForwardPromiseMock.mock);
         mut = require('../src/ges/gesRepository')();
 
     });
@@ -60,7 +59,7 @@ describe('getEventStoreRepository', function() {
         });
         context('when calling getById with multiple events returned',function (){
             it('should return apply all events and presumably loop', async function () {
-                var agg =await mut.getById(TestAgg,uuid.v1(),0);
+                var agg = await mut.getById(TestAgg,uuid.v1(),0);
                 agg.getEventsHandled().length.must.equal(3);
             })
         });
@@ -112,9 +111,9 @@ describe('getEventStoreRepository', function() {
         });
         context('when calling save with proper aggtype', function () {
             it('should create proper stream name', async function () {
-                testAgg.raiseEvent({id:uuid.v1(), type:'someShite', variousProperties:"yeehaw"});
-                testAgg.raiseEvent({id:uuid.v1(), type:'someShite', variousProperties:"yeehaw"});
-                testAgg.raiseEvent({id:uuid.v1(), type:'someShite', variousProperties:"yeehaw"});
+                testAgg.raiseEvent(new Vent('someShite',null,null,{variousProperties:"yeehaw"}));
+                testAgg.raiseEvent(new Vent('someShite',null,null,{variousProperties:"yeehaw"}));
+                testAgg.raiseEvent(new Vent('someShite',null,null,{variousProperties:"yeehaw"}));
                 testAgg._id = uuid.v1();
                 var result = await mut.save(testAgg, uuid.v1(), '');
                 result.streamName.must.equal(streamNameStrategy('TestAgg', testAgg._id,));
@@ -122,9 +121,9 @@ describe('getEventStoreRepository', function() {
         });
         context('when calling save with proper aggtype', function () {
             it('should save proper number of events', async function () {
-                testAgg.raiseEvent({id:uuid.v1(), type:'someShite', variousProperties:"yeehaw"});
-                testAgg.raiseEvent({id:uuid.v1(), type:'someShite', variousProperties:"yeehaw"});
-                testAgg.raiseEvent({id:uuid.v1(), type:'someShite', variousProperties:"yeehaw"});
+                testAgg.raiseEvent(new Vent('someShite',null,null,{variousProperties:"yeehaw"}));
+                testAgg.raiseEvent(new Vent('someShite',null,null,{variousProperties:"yeehaw"}));
+                testAgg.raiseEvent(new Vent('someShite',null,null,{variousProperties:"yeehaw"}));
                 testAgg._id = uuid.v1();
                 var result = await mut.save(testAgg, uuid.v1(), '');
                 result.appendData.events.length.must.equal(3);
@@ -132,20 +131,20 @@ describe('getEventStoreRepository', function() {
         });
         context('when calling save with proper aggtype', function () {
             it('should add proper metadata to events', async function () {
-                testAgg.raiseEvent({id:uuid.v1(), type:'someShite', variousProperties:"yeehaw"});
+                testAgg.raiseEvent(new Vent('someShite',null,null,{variousProperties:"yeehaw"}));
                 testAgg._id = uuid.v1();
                 var commitId = uuid.v1();
                 var result = await mut.save(testAgg, commitId, '');
 
                 var metadata = result.appendData.events[0].Metadata;
                 var parsed = JSON.parse(metadata);
-                parsed.commitIdHeader.should.equal(commitId);
+                parsed.commitIdHeader.must.equal(commitId);
                 parsed.aggregateTypeHeader.must.equal("TestAgg");
             })
         });
         context('when adding and altering metadata', function () {
             it('should result in proper metadata to events', async function () {
-                testAgg.raiseEvent({id:uuid.v1(), type:'someShite', variousProperties:"yeehaw"});
+                testAgg.raiseEvent(new Vent('someShite',null,null,{variousProperties:"yeehaw"}));
                 testAgg._id = uuid.v1();
                 var commitId = uuid.v1();
                 var result = await mut.save(testAgg, commitId, {favoriteCheeze:'headcheeze',aggregateTypeHeader:'MF.TestAgg' });
@@ -157,9 +156,9 @@ describe('getEventStoreRepository', function() {
         });
         context('when calling save on new aggregate', function () {
             it('should calculate proper version number', async function () {
-                testAgg.raiseEvent({id:uuid.v1(), type:'someShite', variousProperties:"yeehaw"});
-                testAgg.raiseEvent({id:uuid.v1(), type:'someShite', variousProperties:"yeehaw"});
-                testAgg.raiseEvent({id:uuid.v1(), type:'someShite', variousProperties:"yeehaw"});
+                testAgg.raiseEvent(new Vent('someShite',null,null,{variousProperties:"yeehaw"}));
+                testAgg.raiseEvent(new Vent('someShite',null,null,{variousProperties:"yeehaw"}));
+                testAgg.raiseEvent(new Vent('someShite',null,null,{variousProperties:"yeehaw"}));
                 testAgg._id = uuid.v1();
                 var result = await mut.save(testAgg, uuid.v1(), '');
                 result.appendData.expectedVersion.must.equal(-1);
@@ -169,9 +168,9 @@ describe('getEventStoreRepository', function() {
         context('when calling save on new aggregate', function () {
             it('should calculate proper version number', async function () {
                 testAgg._version = 5;
-                testAgg.raiseEvent({id:uuid.v1(), type:'someShite', variousProperties:"yeehaw"});
-                testAgg.raiseEvent({id:uuid.v1(), type:'someShite', variousProperties:"yeehaw"});
-                testAgg.raiseEvent({id:uuid.v1(), type:'someShite', variousProperties:"yeehaw"});
+                testAgg.raiseEvent(new Vent('someShite',null,null,{variousProperties:"yeehaw"}));
+                testAgg.raiseEvent(new Vent('someShite',null,null,{variousProperties:"yeehaw"}));
+                testAgg.raiseEvent(new Vent('someShite',null,null,{variousProperties:"yeehaw"}));
                 testAgg._id = uuid.v1();
                 var result = await mut.save(testAgg, uuid.v1(), '');
                 result.appendData.expectedVersion.must.equal(4);

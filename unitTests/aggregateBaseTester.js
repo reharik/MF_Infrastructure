@@ -1,5 +1,6 @@
 
-var should = require("chai").should();
+
+require('must');
 var mockery = require('mockery');
 var testAgg = require("./mocks/testAgg");
 var testAggNoCMDHandlers = require("./mocks/testAggNoCMDHandlers");
@@ -14,7 +15,7 @@ describe('aggregateFunctionality', function() {
     describe('#aggConstructor', function(){
         context('when newing up agg without any command handlers', function () {
             it('should throw proper error', function () {
-                (function(){new testAggNoCMDHandlers()}).should.throw('Invariant Violation: An aggregateRoot requires commandHandlers');
+                (function(){new testAggNoCMDHandlers()}).must.throw(Error,'Invariant Violation: An aggregateRoot requires commandHandlers');
             })
         });
     });
@@ -22,7 +23,7 @@ describe('aggregateFunctionality', function() {
     describe('#aggConstructor', function(){
         context('when newing up agg without any event handlers', function (){
             it('should throw proper error', function () {
-                (function(){new testAggNoEventHandlers()}).should.throw('Invariant Violation: An aggregateRoot requires applyEventHandlers');
+                (function(){new testAggNoEventHandlers()}).must.throw('Invariant Violation: An aggregateRoot requires applyEventHandlers');
             })
         });
     });
@@ -30,8 +31,8 @@ describe('aggregateFunctionality', function() {
     describe('#CommandHandlers', function(){
         context('when newing up agg',function (){
             it('should make commandhandlers available at root', function () {
-                (mut.someCommand instanceof Function).should.be.true;
-                (mut.someOtherCommand instanceof Function).should.be.true;
+                (mut.someCommand instanceof Function).must.be.true;
+                (mut.someOtherCommand instanceof Function).must.be.true;
             })
         });
     });
@@ -40,7 +41,7 @@ describe('aggregateFunctionality', function() {
         context('when calling a commandHandler', function () {
             it('should emit an event to the uncommited event collection and getuncommitedevents should work', function () {
                 mut.someCommand({'commandName':'someEvent', 'value':'some value'});
-                mut.getUncommittedEvents()[0].value.should.equal('some value');
+                mut.getUncommittedEvents()[0].data.blah.must.equal('some value');
             })
         });
     });
@@ -50,7 +51,7 @@ describe('aggregateFunctionality', function() {
             it('should clear events', function () {
                 mut.someCommand({'commandName':'someEvent', 'value':'some value'});
                 mut.clearUncommittedEvents();
-                mut.getUncommittedEvents().should.be.empty;
+                mut.getUncommittedEvents().must.be.empty;
             })
         });
     });

@@ -1,5 +1,5 @@
 var aggBase = require("../../src/models/AggregateRootBase");
-
+var Vent = require('../../src/models/gesEvent');
 
 class TestAgg extends aggBase {
     constructor(){
@@ -14,10 +14,12 @@ class TestAgg extends aggBase {
     commandHandlers() {
         return {
             'someCommand': function (command) {
-                this.raiseEvent({'eventName': 'someshite', 'value': command.value});
+                var vent1 = new Vent('someshite',null,null,{blah:command.value});
+                this.raiseEvent(vent1);
             },
             'someOtherCommand': function (command) {
-                this.raiseEvent({'eventName': 'someOthershite', 'value': command.value});
+                this.raiseEvent(vent2);
+                var vent2 = new Vent('someOthershite',null,null,{blah:command.value});
             }
         }
     }
