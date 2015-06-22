@@ -3,25 +3,17 @@
  */
 
 require('must');
-var mockery = require('mockery');
-//var appendToStream = require('./mocks/appendToStreamPromiseMock');
 var gesEvent = require('../src/models/gesEvent');
 var expectIdempotence = require('./mocks/expectIdempotenceMock');
 var gesConnection = require('./mocks/gesConnectionMock');
-
+var uuid = require('uuid');
 
 describe('gesEventHandlerBase', function() {
     var mut;
     var TestHandler;
     before(function(){
-        mockery.enable({
-            warnOnReplace: false,
-            warnOnUnregistered: false
-        });
-        mockery.registerMock('./gesConnection', gesConnection);
-
         TestHandler = require('./mocks/TestEventHandler');
-        mut = new TestHandler();
+        mut = new TestHandler({gesConnection:gesConnection});
 
     });
     beforeEach(function(){
@@ -38,20 +30,53 @@ describe('gesEventHandlerBase', function() {
         context('when calling handler that throws an exception', function () {
             it('should not process event', async function () {
                 expectIdempotence.setPassesToTrue();
-                var eventData = {
-                    Event:{EventType:'testEvent'},
-                    OriginalPosition:{},
-                    OriginalEvent:{
-                        Metadata:{eventTypeName:'someException'},
-                        Data:{'some':'data'}
-                    }
-
-                };
+                var eventData =new gesEvent('someException',{},{eventTypeName:'someException'},{'some':'data'});
                 var result = await mut.handleEvent(eventData);
-                console.log("here damn it"+JSON.stringify(result,null,4));
-                gesConnection.events[0].data.notificationType.must.equal('failure');
-                //appendToStream.appendedData.appendData.data.notificationType.must.equal('failure');
+                mut.eventsHandled.length.must.equal(0);
             })
         });
+
+        context('when calling handler that throws an exception', function () {
+            it('should send proper notification event', async function () {
+                expectIdempotence.setPassesToTrue();
+                var eventData =new gesEvent('someException',{},{eventTypeName:'someException'},{'some':'data'});
+                var result = await mut.handleEvent(eventData);
+                JSON.parse(result.data.events[0].Data).data.notificationType.must.equal('Failure');
+            })
+        });
+
+        context('when calling handler that DOES NOT throw an exception', function () {
+            it('should send proper notification event', async function () {
+                expectIdempotence.setPassesToTrue();
+                var eventData =new gesEvent('someEvent',{},{eventTypeName:'someEvent'},{'some':'data'});
+                var result = await mut.handleEvent(eventData);
+                JSON.parse(result.data.events[0].Data).data.notificationType.must.equal('Success');
+            })
+        });
+
+        context('when calling handler that DOES NOT throws an exception', function () {
+            it('should process event', async function () {
+                expectIdempotence.setPassesToTrue();
+                var eventData =new gesEvent('someEvent',{},{eventTypeName:'someEvent'},{'some':'data'});
+                var result = await mut.handleEvent(eventData);
+                mut.eventsHandled.length.must.equal(1);
+            });
+        });
+        context('when calling handler is successful', function () {
+            it('should have proper properties on notification event', async function () {
+                expectIdempotence.setPassesToTrue();
+                var continuationId = uuid.v1();
+                var eventData =new gesEvent('someEvent',{},{eventTypeName:'someEvent', continuationId:continuationId},{'some':'data'});
+                var result = await mut.handleEvent(eventData);
+                result.data.expectedVersion.must.equal(-2);
+                console.log(result.data.events[0].Data);
+                result.data.events[0].EventId.length.must.equal(36);
+                result.data.events[0].Type.must.equal('notificationEvent');
+                JSON.parse(result.data.events[0].Data).eventName.must.equal('notificationEvent');
+                JSON.parse(result.data.events[0].Data).data.initialEvent.eventName.must.equal('someEvent');
+                JSON.parse(result.data.events[0].Metadata).continuationId.must.equal(continuationId);
+            })
+        });
+
     });
 });

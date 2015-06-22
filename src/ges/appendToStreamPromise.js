@@ -4,9 +4,9 @@
 
 var Promise = require('bluebird');
 var invariant = require('invariant');
-var gesConnection = require('./gesConnection');
+//var gesConnection = require('./gesConnection');
 
- module.exports = function(streamName, data){
+ module.exports = function(systemOpts, streamName, data){
      invariant(
          streamName,
          'must pass a valid stream name'
@@ -19,12 +19,15 @@ var gesConnection = require('./gesConnection');
          data.events.length>0,
          'must pass data with at least one event'
      );
-
+     systemOpts.logger.trace('wrapping appendToStream in Promise');
      return new Promise(function(resolve,reject){
-         gesConnection.appendToStream(streamName, data, function(err, result) {
+         systemOpts.gesConnection.appendToStream(streamName, data, function(err, result) {
+             systemOpts.logger.trace('appendToStream callback');
             if (err) {
+                systemOpts.logger.debug('rejecting appendToStream Promise with error message: '+err);
                 reject(err);
             } else {
+                systemOpts.logger.debug('resolving appendToStream Promise with response: '+result);
                 resolve(result);
             }
         });

@@ -3,7 +3,7 @@
  */
 
 require('must');
-var mockery = require('mockery');
+//var mockery = require('mockery');
 var uuid = require('uuid');
 require('mochawait');
 
@@ -21,94 +21,12 @@ var testAgg;
 describe('getEventStoreRepository', function() {
     var mut;
     before(function(){
-        mockery.enable({
-            warnOnReplace: false,
-            warnOnUnregistered: false
-        });
-        mockery.registerMock('./gesConnection', gesConnection);
-        mut = require('../src/ges/gesRepository')();
+        mut = require('../src/ges/gesRepository')({gesConnection:gesConnection});
     });
 
     beforeEach(function(){
         testAgg = new TestAgg();
     });
-
-    describe('#getById', function() {
-        context('when calling get by id with bad aggtype', function () {
-            it('should throw proper error',  function () {
-                console.log(mut.getById(BadAgg, uuid.v1(), '').must);
-                return mut.getById(BadAgg, uuid.v1(), '').must.reject.error(Error,"Invariant Violation: aggregateType must inherit from AggregateBase");
-            })
-        });
-        context('when calling getById with bad uuid', function () {
-            it('should throw proper error', function () {
-                return mut.getById(TestAgg,'some non uuid','').must.reject.error(Error,"Invariant Violation: id must be a valid uuid");
-            })
-        });
-        context('when calling getById with bad version', function (){
-            it('should throw proper error', function () {
-                return mut.getById(TestAgg,uuid.v1(),-6).must.reject.error(Error, "Invariant Violation: version number must be greater than or equal to 0");
-
-            })
-        });
-        context('when calling getById with proper args',function (){
-            it('should return proper agg', function () {
-                var data = JSON.stringify(new Vent('someEvent',null,null,{blah:'blah'}));
-                var result = {
-                    Status: 'OK',
-                    NextEventNumber:3,
-                    Events: [{Event:{EventName:'someEvent',Data: data}},{Event:{EventName:'someEvent',Data: data}},{Event:{EventName:'someEvent',Data: data}}],
-                    IsEndOfStream: false
-                };
-                gesConnection.readStreamEventForwardShouldReturnResult(result);
-                return mut.getById(TestAgg,uuid.v1(),0).must.resolve.instanceof(TestAgg);
-            })
-        });
-        context('when calling getById with multiple events returned',function (){
-            it('should return apply all events and presumably loop', async function () {
-                var agg = await mut.getById(TestAgg,uuid.v1(),0);
-                agg.getEventsHandled().length.must.equal(3);
-            })
-        });
-
-        context('when calling getById with multiple events returned',function (){
-            it('should set the agg version properly', async function () {
-                var byId = await mut.getById(TestAgg, uuid.v1(), 0);
-                byId._version.must.equal(3);
-            })
-        });
-
-        context('when calling getById with proper args but stream deleted', function (){
-            it('should throw proper error', function () {
-                readStreamEventsForwardPromiseMock.setResult({
-                    Status: 'StreamDeleted',
-                        NextEventNumber: 500,
-                    Events: [{}],
-                    IsEndOfStream: false
-                });
-                var id = uuid.v1();
-                var streamName = streamNameStrategy(TestAgg.aggregateName(),id);
-                var byId = mut.getById(TestAgg, id, 0);
-                return byId.must.reject.error(Error, 'Aggregate Deleted: '+streamName);
-            })
-        });
-        context('when calling getById with proper args but stream not found', function (){
-            it('should throw proper error', function () {
-                readStreamEventsForwardPromiseMock.setResult({
-                    Status: 'StreamNotFound',
-                    NextEventNumber: 500,
-                    Events: [{}],
-                    IsEndOfStream: false
-                });
-                var id = uuid.v1();
-                var streamName = streamNameStrategy(TestAgg.aggregateName(),id);
-                var byId = mut.getById(TestAgg, id, 0);
-                return byId.must.reject.error(Error, 'Aggregate not found: '+streamName);
-
-            })
-        });
-    });
-
 
     describe('#save', function() {
         context('when calling save with bad aggtype', function () {
@@ -118,12 +36,14 @@ describe('getEventStoreRepository', function() {
         });
         context('when calling save with proper aggtype', function () {
             it('should create proper stream name', async function () {
+                testAgg = new TestAgg();
+
                 testAgg.raiseEvent(new Vent('someShite',null,null,{variousProperties:"yeehaw"}));
                 testAgg.raiseEvent(new Vent('someShite',null,null,{variousProperties:"yeehaw"}));
                 testAgg.raiseEvent(new Vent('someShite',null,null,{variousProperties:"yeehaw"}));
                 testAgg._id = uuid.v1();
                 var result = await mut.save(testAgg, uuid.v1(), '');
-                result.streamName.must.equal(streamNameStrategy('TestAgg', testAgg._id,));
+                result.streamName.must.equal(streamNameStrategy('TestAgg', testAgg._id));
             })
         });
         context('when calling save with proper aggtype', function () {
@@ -133,7 +53,7 @@ describe('getEventStoreRepository', function() {
                 testAgg.raiseEvent(new Vent('someShite',null,null,{variousProperties:"yeehaw"}));
                 testAgg._id = uuid.v1();
                 var result = await mut.save(testAgg, uuid.v1(), '');
-                result.appendData.events.length.must.equal(3);
+                result.data.events.length.must.equal(3);
             })
         });
         context('when calling save with proper aggtype', function () {
@@ -143,7 +63,7 @@ describe('getEventStoreRepository', function() {
                 var commitId = uuid.v1();
                 var result = await mut.save(testAgg, commitId, '');
 
-                var metadata = result.appendData.events[0].Metadata;
+                var metadata = result.data.events[0].Metadata;
                 var parsed = JSON.parse(metadata);
                 parsed.commitIdHeader.must.equal(commitId);
                 parsed.aggregateTypeHeader.must.equal("TestAgg");
@@ -155,7 +75,7 @@ describe('getEventStoreRepository', function() {
                 testAgg._id = uuid.v1();
                 var commitId = uuid.v1();
                 var result = await mut.save(testAgg, commitId, {favoriteCheeze:'headcheeze',aggregateTypeHeader:'MF.TestAgg' });
-                var metadata = result.appendData.events[0].Metadata;
+                var metadata = result.data.events[0].Metadata;
                 var parsed = JSON.parse(metadata);
                 parsed.favoriteCheeze.must.equal("headcheeze");
                 parsed.aggregateTypeHeader.must.equal("MF.TestAgg");
@@ -168,7 +88,7 @@ describe('getEventStoreRepository', function() {
                 testAgg.raiseEvent(new Vent('someShite',null,null,{variousProperties:"yeehaw"}));
                 testAgg._id = uuid.v1();
                 var result = await mut.save(testAgg, uuid.v1(), '');
-                result.appendData.expectedVersion.must.equal(-1);
+                result.data.expectedVersion.must.equal(-1);
             })
         });
 
@@ -180,12 +100,8 @@ describe('getEventStoreRepository', function() {
                 testAgg.raiseEvent(new Vent('someShite',null,null,{variousProperties:"yeehaw"}));
                 testAgg._id = uuid.v1();
                 var result = await mut.save(testAgg, uuid.v1(), '');
-                result.appendData.expectedVersion.must.equal(4);
+                result.data.expectedVersion.must.equal(4);
             })
         });
-    });
-
-    after(function () {
-        mockery.disable();
     });
 });

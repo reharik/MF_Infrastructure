@@ -36,7 +36,6 @@ class gesConnectionMock{
         }
     }
     readStreamEventForwardShouldReturnResult(result){
-        console.log('result '+result);
         this.readStreamEventForwardResult = result;
     }
     readStreamEventForwardShouldFail(){this._readStreamEventForwardShouldFail=true;}

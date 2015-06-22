@@ -9,7 +9,6 @@ module.exports = {
     mock:function(_streamName, _appendData) {
         streamName = _streamName;
         appendData = _appendData;
-        console.log(streamName);
         return Promise.resolve({
             streamName: streamName,
             appendData: appendData

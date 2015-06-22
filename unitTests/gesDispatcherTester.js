@@ -3,7 +3,6 @@
  */
 
 require('must');
-var mockery = require('mockery');
 var gesConnection = require('./mocks/gesConnectionMock');
 var gesEvent = require('../src/models/gesEvent');
 
@@ -13,16 +12,10 @@ describe('gesDispatcher', function() {
     var TestHandler;
     var testHandler;
     before(function(){
-        mockery.enable({
-            warnOnReplace: false,
-            warnOnUnregistered: false
-        });
-        mockery.registerMock('./gesConnection', gesConnection);
-
         var mod = require('../src/ges/gesDispatcher');
         TestHandler = require('./mocks/TestEventHandler');
-        testHandler = new TestHandler();
-        mut = new mod({handlers:[testHandler]});
+        testHandler = new TestHandler({gesConnection:gesConnection});
+        mut = new mod({gesConnection:gesConnection},{handlers:[testHandler]});
 
     });
     beforeEach(function(){
@@ -45,7 +38,7 @@ describe('gesDispatcher', function() {
                     eventType: 'command',
                     handlers:[new TestHandler() ]
                 };
-                var littleD = new dispatcher(opts);
+                var littleD = new dispatcher({gesConnection:gesConnection},opts);
                 littleD.options.stream.must.equal(opts.stream);
                 littleD.options.targetTypeName.must.equal(opts.targetTypeName);
                 littleD.options.eventType.must.equal(opts.eventType);
@@ -169,7 +162,5 @@ describe('gesDispatcher', function() {
 
     });
 
-    after(function () {
-        mockery.disable();
-    });
+
 });

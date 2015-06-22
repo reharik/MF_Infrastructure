@@ -3,10 +3,10 @@
  */
 var Promise = require('bluebird');
 var invariant = require('invariant');
-var gesConnection = require('./gesConnection');
+//var gesConnection = require('./gesConnection');
 
 
-module.exports = function(streamName, skipTake){
+module.exports = function(systemOpts, streamName, skipTake){
     invariant(
         streamName,
         'must pass a valid stream name'
@@ -16,14 +16,16 @@ module.exports = function(streamName, skipTake){
         'must provide the skip take'
     );
 
+    systemOpts.logger.trace('wrapping readStreamEventsForward in Promise');
     return new Promise(function(resolve, reject){
-        console.log(JSON.stringify(gesConnection,null,4));
-
-        gesConnection.readStreamEventsForward(streamName, skipTake ,function(err, results) {
-            if(err){
+        systemOpts.gesConnection.readStreamEventsForward(streamName, skipTake ,function(err, results) {
+            systemOpts.logger.trace('readStreamEventsForward callback');
+            if (err) {
+                systemOpts.logger.debug('rejecting readStreamEventsForward Promise with error message: '+err);
                 reject(err);
-            }else{
-                resolve(results);
+            } else {
+                systemOpts.logger.debug('resolving readStreamEventsForward Promise with response: '+result);
+                resolve(result);
             }
         });
     })
