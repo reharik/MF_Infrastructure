@@ -3,7 +3,7 @@
  */
 var Promise = require('bluebird');
 var invariant = require('invariant');
-var gesConnection = require('gesConnection');
+var gesConnection = require('./gesConnection');
 
 
 module.exports = function(streamName, skipTake){
@@ -17,7 +17,9 @@ module.exports = function(streamName, skipTake){
     );
 
     return new Promise(function(resolve, reject){
-        gesConnection.ReadStreamEventsForward(streamName, skipTake ,function(err, results) {
+        console.log(JSON.stringify(gesConnection,null,4));
+
+        gesConnection.readStreamEventsForward(streamName, skipTake ,function(err, results) {
             if(err){
                 reject(err);
             }else{

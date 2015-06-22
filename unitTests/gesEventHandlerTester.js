@@ -4,9 +4,10 @@
 
 require('must');
 var mockery = require('mockery');
-var appendToStream = require('./mocks/appendToStreamPromiseMock');
+//var appendToStream = require('./mocks/appendToStreamPromiseMock');
 var gesEvent = require('../src/models/gesEvent');
 var expectIdempotence = require('./mocks/expectIdempotenceMock');
+var gesConnection = require('./mocks/gesConnectionMock');
 
 
 describe('gesEventHandlerBase', function() {
@@ -17,8 +18,7 @@ describe('gesEventHandlerBase', function() {
             warnOnReplace: false,
             warnOnUnregistered: false
         });
-        mockery.registerMock('./appendToStreamPromise',appendToStream.mock);
-        mockery.registerMock('./strategies/expectIdempotence',expectIdempotence.mock);
+        mockery.registerMock('./gesConnection', gesConnection);
 
         TestHandler = require('./mocks/TestEventHandler');
         mut = new TestHandler();
@@ -36,7 +36,7 @@ describe('gesEventHandlerBase', function() {
             })
         });
         context('when calling handler that throws an exception', function () {
-            it('should not process event',  function () {
+            it('should not process event', async function () {
                 expectIdempotence.setPassesToTrue();
                 var eventData = {
                     Event:{EventType:'testEvent'},
@@ -47,9 +47,10 @@ describe('gesEventHandlerBase', function() {
                     }
 
                 };
-                mut.handleEvent(eventData);
-                console.log(appendToStream.appendedData);
-                appendToStream.appendedData().appendData.data.notificationType.must.equal('failure');
+                var result = await mut.handleEvent(eventData);
+                console.log("here damn it"+JSON.stringify(result,null,4));
+                gesConnection.events[0].data.notificationType.must.equal('failure');
+                //appendToStream.appendedData.appendData.data.notificationType.must.equal('failure');
             })
         });
     });

@@ -69,6 +69,7 @@ module.exports = function (_options){
                 // get all events, or first batch of events from GES
                 currentSlice = await readStreamEventsForwardPromise(streamName, {start:sliceStart, count: sliceCount});
                 //validate
+                console.log('currentSlice'+JSON.stringify(currentSlice,null,4));
                 if (currentSlice.Status == 'StreamNotFound') {
                     throw new Error('Aggregate not found: ' + streamName);
                 }

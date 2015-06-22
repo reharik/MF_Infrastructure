@@ -5,13 +5,13 @@
 require('must');
 var mockery = require('mockery');
 var uuid = require('uuid');
+require('mochawait');
 
 var TestAgg = require('./mocks/testAgg');
 var AggregateBase = require('./../src/models/AggregateRootBase');
-var readStreamEventsForwardPromiseMock = require('./mocks/readStreamEventsForwardPromiseMock');
-var appendToStreamPromiseMock = require('./mocks/appendToStreamPromiseMock');
 var streamNameStrategy = require('../src/ges/strategies/streamNameStrategy');
 var Vent = require('../src/models/gesEvent');
+var gesConnection = require('./mocks/gesConnectionMock');
 
 var BadAgg = function(){};
 var badAgg = new BadAgg();
@@ -25,10 +25,8 @@ describe('getEventStoreRepository', function() {
             warnOnReplace: false,
             warnOnUnregistered: false
         });
-        mockery.registerMock('./appendToStreamPromise',appendToStreamPromiseMock.mock);
-        mockery.registerMock('./readStreamEventsForwardPromise',readStreamEventsForwardPromiseMock.mock);
+        mockery.registerMock('./gesConnection', gesConnection);
         mut = require('../src/ges/gesRepository')();
-
     });
 
     beforeEach(function(){
@@ -38,6 +36,7 @@ describe('getEventStoreRepository', function() {
     describe('#getById', function() {
         context('when calling get by id with bad aggtype', function () {
             it('should throw proper error',  function () {
+                console.log(mut.getById(BadAgg, uuid.v1(), '').must);
                 return mut.getById(BadAgg, uuid.v1(), '').must.reject.error(Error,"Invariant Violation: aggregateType must inherit from AggregateBase");
             })
         });
@@ -54,6 +53,14 @@ describe('getEventStoreRepository', function() {
         });
         context('when calling getById with proper args',function (){
             it('should return proper agg', function () {
+                var data = JSON.stringify(new Vent('someEvent',null,null,{blah:'blah'}));
+                var result = {
+                    Status: 'OK',
+                    NextEventNumber:3,
+                    Events: [{Event:{EventName:'someEvent',Data: data}},{Event:{EventName:'someEvent',Data: data}},{Event:{EventName:'someEvent',Data: data}}],
+                    IsEndOfStream: false
+                };
+                gesConnection.readStreamEventForwardShouldReturnResult(result);
                 return mut.getById(TestAgg,uuid.v1(),0).must.resolve.instanceof(TestAgg);
             })
         });

@@ -12,6 +12,7 @@ module.exports = class gesEventHandler {
         this.responseMessage;
         this.continuationId;
         this.handlesEvents = [];
+        this.result;
     }
     handleEvent(gesEvent) {
         if (!expectIdempotence(gesEvent)) { return; }
@@ -35,10 +36,11 @@ module.exports = class gesEventHandler {
                     expectedVersion: -2,
                     events: [responseEvent]
                 };
-                console.log("WTF")
-                appendToStream('notification', appendData);
+                this.result = appendToStream('notification', appendData);
             }
         }
+        // largely for testing purposes, sadly
+        return this.result;
     }
 };
 

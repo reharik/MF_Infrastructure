@@ -21,7 +21,7 @@ var gesConnection = require('./gesConnection');
      );
 
      return new Promise(function(resolve,reject){
-        gesConnection.appendToStream(streamName, data, function(err, result) {
+         gesConnection.appendToStream(streamName, data, function(err, result) {
             if (err) {
                 reject(err);
             } else {

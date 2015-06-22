@@ -4,7 +4,6 @@
 
 require('must');
 var mockery = require('mockery');
-var appendToStream = require('./mocks/appendToStreamPromiseMock');
 var gesConnection = require('./mocks/gesConnectionMock');
 var gesEvent = require('../src/models/gesEvent');
 
@@ -19,7 +18,6 @@ describe('gesDispatcher', function() {
             warnOnUnregistered: false
         });
         mockery.registerMock('./gesConnection', gesConnection);
-        mockery.registerMock('./appendToStreamPromise',appendToStream.mock);
 
         var mod = require('../src/ges/gesDispatcher');
         TestHandler = require('./mocks/TestEventHandler');
@@ -100,7 +98,7 @@ describe('gesDispatcher', function() {
                     }
 
                 };
-                subscription.emit('event', eventData);console.log(testHandler.eventsHandled.length);
+                subscription.emit('event', eventData);
                 var eventsHandled = testHandler.eventsHandled[0];
                 eventsHandled.eventName.must.equal('someEvent');
                 eventsHandled.originalPosition.must.equal('the originalPosition');
@@ -162,9 +160,7 @@ describe('gesDispatcher', function() {
                 var eventData = {
                     Event:{EventType:'testEvent'},
                     OriginalPosition:{},
-                    OriginalEvent:{
-                    }
-
+                    OriginalEvent:{}
                 };
                 subscription.emit('event', eventData);
                 testHandler.eventsHandled.length.must.equal(0);
