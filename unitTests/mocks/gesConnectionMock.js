@@ -4,43 +4,49 @@
 
 
 var Subscription = require('./SubscriptionMock');
-
-class gesConnectionMock{
-    constructor(){
-        this.subscription;
-        this._appendToStreamShouldFail;
-        this._readStreamEventForwardShouldFail;
-        this.readStreamEventForwardResult;
-    }
-    subscribeToStream(){
+function gesConnectionMock(){
+    var subscription;
+    var _appendToStreamShouldFail;
+    var _readStreamEventForwardShouldFail;
+    var readStreamEventForwardResult;
+    var subscribeToStream = function(){
         this.subscription = new Subscription();
         return this.subscription;
-    }
+    };
 
-    appendToStream(streamName, data, cb){
+    var appendToStream= function(streamName, data, cb){
         console.log('mock append');
 
         var results = {streamName:streamName, data:data};
-        if(this._appendToStreamShouldFail){ cb(results); }
+        if(_appendToStreamShouldFail){ cb(results); }
         else { cb(null,results); }
-    }
+    };
 
-    readStreamEventsForward(streamName, skipTake, cb){
+    var readStreamEventsForward= function(streamName, skipTake, cb){
         console.log('mock read');
-        var results = {streamName:streamName, skipTake:skipTake, result: this.readStreamEventForwardResult};
-        if(this._readStreamEventForwardShouldFail){
-            cb(this.readStreamEventForwardResult?this.readStreamEventForwardResult: results);
+        var results = {streamName:streamName, skipTake:skipTake, result: readStreamEventForwardResult};
+        if(_readStreamEventForwardShouldFail){
+            cb(readStreamEventForwardResult?readStreamEventForwardResult: results);
         }
         else {
-            cb(null,this.readStreamEventForwardResult?this.readStreamEventForwardResult: results);
+            cb(null,readStreamEventForwardResult?readStreamEventForwardResult: results);
         }
+    };
+    var readStreamEventForwardShouldReturnResult= function(result){
+        readStreamEventForwardResult = result;
+    };
+    var readStreamEventForwardShouldFail= function(){_readStreamEventForwardShouldFail=true;};
+    var appendToStreamShouldFail= function(){_appendToStreamShouldFail=true;};
+
+    return{
+        subscribeToStream:subscribeToStream,
+        appendToStream:appendToStream,
+        readStreamEventsForward:readStreamEventsForward,
+        readStreamEventForwardShouldReturnResult:readStreamEventForwardShouldReturnResult,
+        readStreamEventForwardShouldFail:readStreamEventForwardShouldFail,
+        appendToStreamShouldFail:appendToStreamShouldFail
     }
-    readStreamEventForwardShouldReturnResult(result){
-        this.readStreamEventForwardResult = result;
-    }
-    readStreamEventForwardShouldFail(){this._readStreamEventForwardShouldFail=true;}
-    appendToStreamShouldFail(){this._appendToStreamShouldFail=true;}
 
 }
 
-module.exports = new gesConnectionMock();
+module.exports = gesConnectionMock;

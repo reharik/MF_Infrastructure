@@ -1,7 +1,8 @@
 /**
  * Created by rharik on 6/19/15.
  */
-var gesEvent = require('./gesEvent');
+
+var gesEvent = global.container.gesEvent;
 
 module.exports = class NotificationEvent extends gesEvent{
     constructor(_notificationType, _message, _initialEvent){

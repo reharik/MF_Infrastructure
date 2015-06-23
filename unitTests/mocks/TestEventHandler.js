@@ -2,11 +2,11 @@
  * Created by rharik on 6/19/15.
  */
 
-var EventHandler = require('../../src/ges/gesEventHandlerBase');
+var EventHandler = global.container.gesEventHandlerBase;
 
 module.exports = class TestEventHandler extends EventHandler{
-    constructor(_systemOpts) {
-        super(_systemOpts);
+    constructor() {
+        super();
         this.handlesEvents = ['someEvent'];
         this.eventsHandled = []
     }

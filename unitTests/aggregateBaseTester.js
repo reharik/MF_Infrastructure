@@ -1,7 +1,8 @@
 
 
 require('must');
-var mockery = require('mockery');
+var bs = require('../bootstrap');
+bs.start();
 var testAgg = require("./mocks/testAgg");
 var testAggNoCMDHandlers = require("./mocks/testAggNoCMDHandlers");
 var testAggNoEventHandlers = require("./mocks/testAggNoEventHandlers");

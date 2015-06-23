@@ -2,56 +2,57 @@
  * Created by rharik on 6/18/15.
  */
 
-var Notification = require('../models/NotificationEvent');
-var appendToStream = require('./appendToStreamPromise');
-var expectIdempotence = require('./strategies/expectIdempotence');
-var EventData = require('../models/EventData');
+var Notification = global.container.NotificationEvent;
+var appendToStream = global.container.appendToStreamPromise;
+var expectIdempotence = global.container.expectIdempotence;
+var EventData = global.container.EventData;
+var logger = global.container.logger;
 
 module.exports = class gesEventHandler {
-    constructor(_systemOpts) {
-        this.systemOpts = _systemOpts;
+    constructor() {
         this.responseMessage;
         this.continuationId;
         this.handlesEvents = [];
         this.result;
         this.eventHandlerName;
+
     }
     handleEvent(gesEvent) {
-        _systemOpts.logger.debug('checking event for idempotence');
+        logger.debug('checking event for idempotence');
         if (!expectIdempotence(gesEvent)) { return; }
-        _systemOpts.logger.trace('event idempotent');
+        logger.trace('event idempotent');
 
         try {
-            _systemOpts.logger.debug('building response notification');
+            logger.debug('building response notification');
             this.responseMessage = new Notification("Success", "Success", gesEvent);
             this.continuationId = gesEvent.metadata.continuationId;
-            _systemOpts.logger.trace('getting continuation Id: '+this.continuationId);
-            _systemOpts.logger.info('calling specific event hanbdler for: '+gesEvent.eventName+ ' on '+this.eventHandlerName);
+            logger.trace('getting continuation Id: '+this.continuationId);
+            logger.info('calling specific event hanbdler for: '+gesEvent.eventName+ ' on '+this.eventHandlerName);
             this[gesEvent.eventName](gesEvent);
-            _systemOpts.logger.trace('event Handled by: '+gesEvent.eventName+ ' on '+this.eventHandlerName);
+            logger.trace('event Handled by: '+gesEvent.eventName+ ' on '+this.eventHandlerName);
 
         } catch (exception) {
-            _systemOpts.logger.error('event: ' +gesEvent+ ' threw exception: '+exception);
+            logger.error('event: ' +gesEvent+ ' threw exception: '+exception);
             this.responseMessage = new Notification("Failure", exception.message, gesEvent);
         } finally {
             if (this.responseMessage) {
-                _systemOpts.logger.trace('beginning to process responseMessage');
+                logger.trace('beginning to process responseMessage');
 
                 var responseEvent = new EventData(this.responseMessage.id,
                     this.responseMessage.eventName,
                     this.responseMessage,
                     {"continuationId": this.continuationId});
 
-                _systemOpts.logger.debug('response event created: '+responseEvent);
+                logger.debug('response event created: '+responseEvent);
 
                 var appendData = {
                     expectedVersion: -2,
                     events: [responseEvent]
                 };
-                _systemOpts.logger.debug('event data created: '+appendData);
+                logger.debug('event data created: '+appendData);
 
-                _systemOpts.logger.trace('publishing notification');
-                this.result = appendToStream(this.systemOpts, 'notification', appendData);
+                logger.trace('publishing notification');
+                this.result = appendToStream('notification', appendData);
             }
         }
         // largely for testing purposes, sadly

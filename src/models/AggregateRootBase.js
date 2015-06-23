@@ -2,7 +2,8 @@
  * Created by reharik on 6/8/15.
  */
 
-const invariant = require('invariant');
+
+var invariant = global.container.invariant;
 
 class AggregateBase {
     constructor() {

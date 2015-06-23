@@ -1,5 +1,8 @@
-var aggBase = require("../../src/models/AggregateRootBase");
-var Vent = require('../../src/models/gesEvent');
+//var bs = require('../../bootstrap');
+
+var aggBase = global.container.AggregateRootBase;
+var Vent = global.container.gesEvent;
+console.log(aggBase);
 
 class TestAgg extends aggBase {
     constructor(){

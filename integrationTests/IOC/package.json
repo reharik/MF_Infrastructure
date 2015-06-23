@@ -10,6 +10,9 @@
   },
   "license": "MIT",
   "node": ">=0.12.0",
+  "internalDependencies":{
+    "gesConnection":"../../src/ges/gesConnection"
+  },
   "dependencies": {
     "bluebird": "^2.9.27",
     "co": "^4.5.4",
@@ -36,20 +39,5 @@
     "mochawait": "^2.0.1",
     "mockery": "^1.4.0",
     "must": "^0.12.0"
-  },
-  "internalDependencies": {
-    "logger":"/src/ges/strategies/logger",
-    "expectIdempotence":"/src/ges/strategies/expectIdempotence",
-    "streamNameStrategy":"/src/ges/strategies/streamNameStrategy",
-    "AggregateRootBase": "/src/models/AggregateRootBase",
-    "EventData": "/src/models/EventData",
-    "gesEvent": "/src/models/gesEvent",
-    "NotificationEvent": "/src/models/NotificationEvent",
-    "gesConnection": "/src/ges/gesConnection",
-    "appendToStreamPromise": "/src/ges/appendToStreamPromise",
-    "gesDispatcher": "/src/ges/gesDispatcher",
-    "gesEventHandlerBase": "/src/ges/gesEventHandlerBase",
-    "gesRepository": "/src/ges/gesRepository",
-    "readStreamEventsForwardPromise": "/src/ges/readStreamEventsForwardPromise"
   }
 }

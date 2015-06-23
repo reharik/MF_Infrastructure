@@ -1,4 +1,4 @@
-var aggBase = require("../../src/models/AggregateRootBase");
+var aggBase = global.container.AggregateRootBase;
 
 
 class TestAgg extends aggBase {

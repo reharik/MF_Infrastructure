@@ -1,5 +1,6 @@
 
-var uuid = require('uuid');
+
+var uuid = global.container.uuid;
 
 
 module.exports = class gesEvent{

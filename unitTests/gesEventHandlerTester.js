@@ -2,21 +2,33 @@
  * Created by rharik on 6/19/15.
  */
 
+global.container = null;
+var bs = require('../bootstrap');
+bs.start();
+bs.inject([
+    {expectIdempotence:'./unitTests/mocks/expectIdempotenceMock'},
+    {gesConnection:'./unitTests/mocks/gesConnectionMock'},
+    {TestEventHandler:'./unitTests/mocks/TestEventHandler'}
+
+]);
+
 require('must');
-var gesEvent = require('../src/models/gesEvent');
-var expectIdempotence = require('./mocks/expectIdempotenceMock');
-var gesConnection = require('./mocks/gesConnectionMock');
-var uuid = require('uuid');
+var expectIdempotence  = global.container.expectIdempotence;
+var gesConnection = global.container.gesConnection;
+var TestHandler = global.container.TestEventHandler;
+
+var gesEvent = global.container.gesEvent;
+var uuid = global.container.uuid;
 
 describe('gesEventHandlerBase', function() {
     var mut;
-    var TestHandler;
     before(function(){
-        TestHandler = require('./mocks/TestEventHandler');
-        mut = new TestHandler({gesConnection:gesConnection});
-
+        mut = new TestHandler();
     });
     beforeEach(function(){
+        //console.log(gesConnection);
+        //console.log(global.container);
+
         mut.clearEventsHandled();
     });
 

@@ -2,21 +2,22 @@
  * Created by rharik on 6/10/15.
  */
 
-var invariant = require('invariant');
-var AggregateBase = require('./../models/AggregateRootBase');
-var _ = require("lodash");
-var EventData = require('../models/EventData');
-var appendToStreamPromise = require('./appendToStreamPromise');
-var readStreamEventsForwardPromise = require('./readStreamEventsForwardPromise');
-var streamNameStrategy = require('./strategies/streamNameStrategy');
+
+//var bs = require('../../bootstrap');
+var invariant = global.container.invariant;
+var AggregateBase = global.container.AggregateRootBase;
+var _ = global.container.lodash;
+var EventData = global.container.EventData;
+var appendToStreamPromise = global.container.appendToStreamPromise;
+var readStreamEventsForwardPromise = global.container.readStreamEventsForwardPromise;
+var streamNameStrategy = global.container.streamNameStrategy;
+var logger = global.container.logger;
 
 
-module.exports = function (_systemOpts, _options){
-    _systemOpts.logger.trace('constructing gesRepository');
-    _systemOpts.logger.debug('gesRepository system options ' + _systemOpts);
-    _systemOpts.logger.debug('gesRepository options passed in ' + _options);
+module.exports = function (_options){
+    logger.trace('constructing gesRepository');
+    logger.debug('gesRepository options passed in ' + _options);
 
-    var systemOpts = _systemOpts;
     var options = {
         eventTypeHeader:'eventTypeName',
         aggregateTypeHeader: 'aggregateTypeName',
@@ -25,7 +26,7 @@ module.exports = function (_systemOpts, _options){
         readPageSize: 1
     };
     _.assign(options, _options);
-    _systemOpts.logger.debug('gesRepository options after merge ' + this.options);
+    logger.debug('gesRepository options after merge ' + this.options);
 
     invariant(
         options.eventTypeHeader,
@@ -49,7 +50,7 @@ module.exports = function (_systemOpts, _options){
     );
 
     async function getById(aggregateType, id, version){
-        _systemOpts.logger.debug('gesRepo calling getById with params:' +aggregateType+', '+id+', '+version);
+        logger.debug('gesRepo calling getById with params:' +aggregateType+', '+id+', '+version);
 
         var streamName;
         var aggregate;
@@ -71,21 +72,21 @@ module.exports = function (_systemOpts, _options){
             );
 
             streamName =  streamNameStrategy(aggregateType.aggregateName(), id);
-            _systemOpts.logger.debug('stream from which events will be pulled: ' + streamName);
-            _systemOpts.logger.trace('constructing aggregate');
+            logger.debug('stream from which events will be pulled: ' + streamName);
+            logger.trace('constructing aggregate');
             aggregate = new aggregateType();
 
-            _systemOpts.logger.debug('beginning loop to retrieve events');
+            logger.debug('beginning loop to retrieve events');
             do {
                 // specify number of events to pull. if number of events too large for one call use limit
-                _systemOpts.logger.debug('begining new iteration');
+                logger.debug('begining new iteration');
 
                 sliceCount = sliceStart + options.readPageSize <= options.readPageSize ? options.readPageSize : version - sliceStart + 1;
-                _systemOpts.logger.trace('number of events to pull this iteration: '+ sliceCount);
+                logger.trace('number of events to pull this iteration: '+ sliceCount);
                 // get all events, or first batch of events from GES
 
-                _systemOpts.logger.info('about to pull events for '+aggregateType+' from stream '+ streamName);
-                currentSlice = await readStreamEventsForwardPromise(systemOpts, streamName, {start:sliceStart, count: sliceCount});
+                logger.info('about to pull events for '+aggregateType+' from stream '+ streamName);
+                currentSlice = await readStreamEventsForwardPromise( streamName, {start:sliceStart, count: sliceCount});
                 //validate
                 if (currentSlice.Status == 'StreamNotFound') {
                     throw new Error('Aggregate not found: ' + streamName);
@@ -95,16 +96,16 @@ module.exports = function (_systemOpts, _options){
                     throw new Error('Aggregate Deleted: '+ streamName);
                 }
 
-                _systemOpts.logger.info('events retrieved from stream: '+streamName);
+                logger.info('events retrieved from stream: '+streamName);
                 sliceStart = currentSlice.NextEventNumber;
-                _systemOpts.logger.trace('new sliceStart calculated: '+sliceStart);
+                logger.trace('new sliceStart calculated: '+sliceStart);
 
-                _systemOpts.logger.debug('about to loop through and apply events to aggreagate');
+                logger.debug('about to loop through and apply events to aggreagate');
                 currentSlice.Events.forEach(e=> aggregate.applyEvent(JSON.parse(e.Event.Data)));
-                _systemOpts.logger.info('events applied to aggregate');
+                logger.info('events applied to aggregate');
             } while (version >= currentSlice.NextEventNumber && !currentSlice.IsEndOfStream);
         } catch (error){
-            _systemOpts.logger.error('error retrieving aggreage: '+error);
+            logger.error('error retrieving aggreage: '+error);
             throw(error);
         }
 
@@ -114,7 +115,7 @@ module.exports = function (_systemOpts, _options){
 
 
     async function save(aggregate, commitId, _metadata){
-        _systemOpts.logger.debug('gesRepo calling save with params:' +aggregate+', '+commitId+', '+_metadata);
+        logger.debug('gesRepo calling save with params:' +aggregate+', '+commitId+', '+_metadata);
         var streamName;
         var newEvents;
         var metadata;
@@ -136,37 +137,37 @@ module.exports = function (_systemOpts, _options){
                 // type of aggregate being persisted
                 aggregateTypeHeader: aggregate.constructor.name
             };
-            _systemOpts.logger.debug('default metadata:' +metadata);
+            logger.debug('default metadata:' +metadata);
 
             // add extra data to metadata portion of persisted event
             _.assign(metadata, _metadata);
-            _systemOpts.logger.debug('merged metadata: '+metadata);
+            logger.debug('merged metadata: '+metadata);
 
             streamName =  streamNameStrategy(aggregate.constructor.name, aggregate.id());
-            _systemOpts.logger.debug('gesRepo calling getById with params:' +aggregateType+', '+id+', '+version);
-            _systemOpts.logger.trace('retrieving uncommited events');
+            logger.debug('gesRepo calling getById with params:' +aggregateType+', '+id+', '+version);
+            logger.trace('retrieving uncommited events');
             newEvents = aggregate.getUncommittedEvents();
 
             originalVersion = aggregate.version() - newEvents.length;
-            _systemOpts.logger.trace('calculating original version number:' +aggregate.version()+' - '+newEvents.length+' = '+originalVersion);
+            logger.trace('calculating original version number:' +aggregate.version()+' - '+newEvents.length+' = '+originalVersion);
             expectedVersion = originalVersion == 0 ? -1 : originalVersion-1;
-            _systemOpts.logger.trace('calculating expected version :' +expectedVersion);
+            logger.trace('calculating expected version :' +expectedVersion);
 
-            _systemOpts.logger.debug('creating EventData for each event');
+            logger.debug('creating EventData for each event');
             events = newEvents.map(x=> new EventData(x.id, x.type, x, metadata));
-            _systemOpts.logger.trace('EventData created for each event');
+            logger.trace('EventData created for each event');
 
             appendData = {
                 expectedVersion: expectedVersion,
                 events: events
             };
-            _systemOpts.logger.debug('event data for posting created: '+appendData);
+            logger.debug('event data for posting created: '+appendData);
 
-            _systemOpts.logger.trace('about to append events to stream');
-            result = await appendToStreamPromise(systemOpts, streamName, appendData);
-            _systemOpts.logger.debug('events posted to stream:' +streamName);
+            logger.trace('about to append events to stream');
+            result = await appendToStreamPromise(streamName, appendData);
+            logger.debug('events posted to stream:' +streamName);
 
-            _systemOpts.logger.trace('clear uncommitted events form aggregate');
+            logger.trace('clear uncommitted events form aggregate');
             aggregate.clearUncommittedEvents();
             //largely for testing purposes
             return result;

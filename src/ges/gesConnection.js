@@ -1,15 +1,18 @@
 
-var ges = require('ges-client');
-var config = require('config');
+//var bs = require('../../bootstrap');
+
+var ges = global.container.gesclient;
+var config = global.container.config;
+var logger = global.container.logger;
 
 var connection;
-var getConnection = function(_logger){
-    _logger.trace('accessing gesConnection');
+var getConnection = function(){
+    logger.trace('accessing gesConnection');
     if(!connection){
-        _logger.debug('creating gesConnection')
+        logger.debug('creating gesConnection');
         connection = ges({ip: config.get('eventstore.ip'), tcp: 1113})
     }
-    _logger.debug('gesConnection: '+connection);
+    logger.debug('gesConnection: '+connection);
     return connection;
 };
-module.exports = getConnection();
+module.exports = getConnection;
