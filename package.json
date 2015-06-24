@@ -14,6 +14,7 @@
     "bluebird": "^2.9.27",
     "co": "^4.5.4",
     "config": "^1.14.0",
+    "fn-args": "^1.0.0",
     "ges-client": "^0.9.1",
     "invariant": "^2.1.0",
     "lodash": "^3.9.3",
@@ -38,9 +39,9 @@
     "must": "^0.12.0"
   },
   "internalDependencies": {
-    "logger":"/src/ges/strategies/logger",
-    "expectIdempotence":"/src/ges/strategies/expectIdempotence",
-    "streamNameStrategy":"/src/ges/strategies/streamNameStrategy",
+    "logger": "/src/ges/strategies/logger",
+    "expectIdempotence": "/src/ges/strategies/expectIdempotence",
+    "streamNameStrategy": "/src/ges/strategies/streamNameStrategy",
     "AggregateRootBase": "/src/models/AggregateRootBase",
     "EventData": "/src/models/EventData",
     "gesEvent": "/src/models/gesEvent",
