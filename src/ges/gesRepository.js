@@ -4,14 +4,7 @@
 
 
 //var bs = require('../../bootstrap');
-var invariant = global.container.invariant;
-var AggregateBase = global.container.AggregateRootBase;
-var _ = global.container.lodash;
-var EventData = global.container.EventData;
-var appendToStreamPromise = global.container.appendToStreamPromise;
-var readStreamEventsForwardPromise = global.container.readStreamEventsForwardPromise;
-var streamNameStrategy = global.container.streamNameStrategy;
-var logger = global.container.logger;
+
 
 
 module.exports = function(invariant,

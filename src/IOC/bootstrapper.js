@@ -7,98 +7,70 @@ var fnArgs = require('fn-args');
 var appRoot = path.resolve('./');
 
 
-module.exports = function(){
-    var pjson;
-    var resolvedDeps = {};
-    var unresolvedDeps = {};
 
-    var start = function(pathToPackageJson){
+
+var container = function(){
+    var bootstrapper;
+    initialize(registryFunc) {
+        bootstrapper = new Bootstrapper(registryFunc);
+        bootstrapper.init();
+    }
+    getInstanceOf(_type){
+        return bootstrapper.getInstanceOf(_type);
+    }
+    return {
+        initialize: initialize,
+        getInstanceOf: getInstanceOf
+    }
+}();
+
+
+class Bootstrapper{
+    constructor(registryFunc) {
+        this.dependencyGraph = [];
+        var registryDSL = new RegistryDSL();
+        var registry = registryFunc(registryDSL);
         // analze path to see if it incluedes the package.json or just the path.
         // for now presuming it has the path
         // also presuming from app root
-        pjson = require(path.join(appRoot,pathToPackageJson));
-        loadOutsideDependencies();
-        loadInsideDependencies();
-        resolveInsideDependencies();
-        return resolvedDeps;
-    };
+        this.pjson = require(path.join(appRoot,registry.pathToJsonConfig));
+        this.explicitOverrides = registry.dependencyDeclarations;
+        processDependencies();
+    }
 
-    var loadOutsideDependencies = function() {
-        getKeys(pjson.dependencies).map(x=> {
-            var clean = x.replace('-', '');
-            if (!resolvedDeps[clean]) {
-                resolvedDeps[clean] = require(x);
+    processDependencies(){
+        this.dependencyGraph = getKeys(this.pjson.dependencies).map(x=> {return {name:x, resolved:false, instance:function(){return require(x)}}})
+            .concat(getKeys(this.pjson.internalDependencies).map(x=> {return {name:x, resolved:false, instance:require(this.pjson.internalDependencies[x])}}));
+        recurseTree(this.dependencyGraph);
+    }
+
+    recurseTree(items){
+        items.map(x=>{
+            var children = getUnResolvedChildren(x);
+            if(children && children.length>0){
+                recurseTree(children);
+            }else{
+                return resolveDependency(x);
             }
-        });
-    };
+        })
+    }
 
-    var loadInsideDependencies = function() {
-        if(!pjson.internalDependencies) {
-            return;
+    getUnResolvedChildren(item) {
+        return fnArgs(item.instance).filter(d => this.dependencyGraph.some(r=> r.name == d && !r.resolved ));
+    }
+
+    resolveDependency(item) {
+        var override = this.explicitOverrides.find(x=>x.name == item.name);
+        if(override){
+            override.instance = require(override.path);
+            return {name:override.name,
+                resolved:true,
+                instance:override.instance(fnArgs(override.instance).map(d => this.dependencyGraph.find(x=>x.name==d).instance))};
+        }else{
+            return {name:item.name,
+                resolved:true,
+                instance:item.instance(fnArgs(item.instance).map(d => this.dependencyGraph.find(x=>x.name==d).instance))};
         }
-        getKeys(pjson.internalDependencies).map(x=> {
-            var pathToDep =path.join(appRoot,pjson.internalDependencies[x]);
-            unresolvedDeps[x] = require(pathToDep);
-        });
-    };
+    }
 
-    var checkIfAllDependenciesRegistered = function(module, avaliableDependencies){
-        if(!fnArgs(module).every(arg => avaliableDependencies.some(dep => dep==arg))){
-            throw(new Error('dependency is not registered'))
-        }
-    };
-
-    var getArgs = function(module){
-        return fnArgs(module).map(x=> resolvedDeps[x]);
-    };
-
-    var resolveAndAddToCollection = function(moduleKey){
-        var module = unresolvedDeps[moduleKey];
-        resolvedDeps[moduleKey] = module.apply(module, getArgs(module))
-    };
-
-    var getKeys = function(obj){
-        return Object.keys(obj).map(x=>obj[x]);
-    };
-    var resolveInsideDependencies = function(){
-        if(_.isEmpty(unresolvedDeps)){return;}
-
-        var availableDependencies = _.union(getKeys(unresolvedDeps), getKeys(resolvedDeps));
-
-        unresolvedDeps.forEach(x=> checkIfAllDependenciesRegistered(x,availableDependencies));
-
-        var stopLoop;
-        while(!stopLoop){
-            getKeys(unresolvedDeps).forEach(u=>{
-                if(fnArgs(unresolvedDeps[u]).every(getKeys(resolvedDeps))){
-                    resolveAndAddToCollection(u);
-                    delete unresolvedDeps[u];
-                }
-            });
-            stopLoop = getKeys(unresolvedDeps).length>0;
-        }
-    };
-
-    var inject = function(substitutions){
-        //var keys = substitutions.map(s => Object.keys(s).map(x=> {
-        //    console.log(x);
-        //    var pathToDep =path.join(appRoot,s[x]);
-        //    global.container[x] = require(pathToDep);
-        //    console.log(global.container[x] );
-        //    return x;
-        //}));
-        //
-        //if(pjson.internalDependencies) {
-        //    require.cache = {}
-        //    Object.keys(pjson.internalDependencies).map(x=> {
-        //        if(!_.some(keys, s=> s == x )) {
-        //            console.log("rebuilding; "+x);
-        //            var pathToDep = path.join(appRoot, pjson.internalDependencies[x]);
-        //            global.container[x] = require(pathToDep);
-        //        }
-        //    });
-        //}
-    };
-    return {start:start,
-            inject:inject};
-}();
+};

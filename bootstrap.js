@@ -3,16 +3,15 @@
  */
 var bootstrapper = require('./src/IOC/bootstrapper');
 
-module.exports ={
-    start:function(){
-        if(!global.container) {
+var bootstrap = function() {};
+bootstrap.container = bootstrapper.container;
+    start(){
+        if(!container) {
             console.log('loading dependencies');
             bootstrapper.start('./package.json');
         }else {
-            console.log('global.container already loaded');
+            console.log('container already loaded');
         }
-    },
-    inject:function(substitutions){
-        bootstrapper.inject(substitutions);
     }
+
 };

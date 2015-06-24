@@ -1,9 +1,7 @@
 
 
-var uuid = global.container.uuid;
 
-
-module.exports = function() {
+module.exports = function(uuid) {
     return class gesEvent {
         constructor(_eventName, _originalPosition, _metadata, _data) {
             this.id = uuid.v1();
