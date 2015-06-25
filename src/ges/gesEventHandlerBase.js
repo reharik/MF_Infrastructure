@@ -2,7 +2,7 @@
  * Created by rharik on 6/18/15.
  */
 
-module.exports = function(Notification, appendToStream, expectIdempotence, EventData, logger) {
+module.exports = function(NotificationEvent, appendToStreamPromise, expectIdempotence, EventData, logger) {
     return class gesEventHandler {
         constructor() {
             this.responseMessage;
@@ -22,7 +22,7 @@ module.exports = function(Notification, appendToStream, expectIdempotence, Event
 
             try {
                 logger.debug('building response notification');
-                this.responseMessage = new Notification("Success", "Success", gesEvent);
+                this.responseMessage = new NotificationEvent("Success", "Success", gesEvent);
                 this.continuationId = gesEvent.metadata.continuationId;
                 logger.trace('getting continuation Id: ' + this.continuationId);
                 logger.info('calling specific event hanbdler for: ' + gesEvent.eventName + ' on ' + this.eventHandlerName);
@@ -31,7 +31,7 @@ module.exports = function(Notification, appendToStream, expectIdempotence, Event
 
             } catch (exception) {
                 logger.error('event: ' + gesEvent + ' threw exception: ' + exception);
-                this.responseMessage = new Notification("Failure", exception.message, gesEvent);
+                this.responseMessage = new NotificationEvent("Failure", exception.message, gesEvent);
             } finally {
                 if (this.responseMessage) {
                     logger.trace('beginning to process responseMessage');

@@ -2,7 +2,7 @@
  * Created by rharik on 6/18/15.
  */
 
-module.exports = function(config, invariant, lodash, gesEvent, gesConnection, logger) {
+module.exports = function(config, invariant, lodash, GesEvent, gesConnection, logger) {
     var _ = lodash;
     return class gesDispatcher {
         constructor(_options) {
@@ -39,7 +39,7 @@ module.exports = function(config, invariant, lodash, gesEvent, gesConnection, lo
                 return;
             }
             logger.debug('event passed through filter');
-            var vent = new gesEvent(payload.OriginalEvent.Metadata[this.options.targetTypeName],
+            var vent = new GesEvent(payload.OriginalEvent.Metadata[this.options.targetTypeName],
                 payload.OriginalPosition,
                 payload.OriginalEvent.Metadata,
                 payload.OriginalEvent.Data);

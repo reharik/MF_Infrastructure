@@ -2,8 +2,8 @@
  * Created by rharik on 6/12/15.
  */
 
-module.exports = function appendToStreamPromise(Promise, invariant, logger, gesConnection) {
-
+module.exports = function appendToStreamPromise(bluebird, invariant, logger, gesConnection) {
+    var Promise = bluebird;
     return function (streamName, data) {
 
         invariant(

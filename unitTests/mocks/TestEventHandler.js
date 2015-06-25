@@ -2,22 +2,25 @@
  * Created by rharik on 6/19/15.
  */
 
-var EventHandler = global.container.gesEventHandlerBase;
 
-module.exports = class TestEventHandler extends EventHandler{
-    constructor() {
-        super();
-        this.handlesEvents = ['someEvent'];
-        this.eventsHandled = []
-    }
-    someEvent(vnt){
-        this.eventsHandled.push(vnt);
-    }
-    someException(vnt){
-        throw(new Error());
-    }
+module.exports = function(gesEventHandlerBase) {
+    return class TestEventHandler extends gesEventHandlerBase {
+        constructor() {
+            super();
+            this.handlesEvents = ['someEvent'];
+            this.eventsHandled = []
+        }
 
-    clearEventsHandled(){
-        this.eventsHandled=[];
-    }
+        someEvent(vnt) {
+            this.eventsHandled.push(vnt);
+        }
+
+        someException(vnt) {
+            throw(new Error());
+        }
+
+        clearEventsHandled() {
+            this.eventsHandled = [];
+        }
+    };
 };

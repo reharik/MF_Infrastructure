@@ -1,15 +1,20 @@
-var aggBase = global.container.AggregateRootBase;
 
 
-class TestAgg extends aggBase {
-    applyEventHandlers() {
-        return {
-            'someEvent': function (event) {
-            },
-            'someOtherEvent': function (event) {
+module.exports = function (AggregateRootBase) {
+    return class TestAggNoCMDHandlers extends AggregateRootBase {
+        constructor(){
+            super();
+            this.eventsHandled = [];
+        }
+        applyEventHandlers() {
+            return {
+                'someEvent': function (event) {
+                    this.eventsHandled.push(event);
+                }.bind(this),
+                'someOtherEvent': function (event) {
+                    this.eventsHandled.push(event);
+                }.bind(this)
             }
         }
-    }
-}
-
-module.exports = TestAgg;
+    };
+};

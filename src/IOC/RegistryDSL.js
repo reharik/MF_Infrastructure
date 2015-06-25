@@ -2,7 +2,7 @@
  * Created by rharik on 6/24/15.
  */
 
-class RegistryDSL{
+module.exports = class RegistryDSL{
     constructor(){
         this._pathToJsonConfig;
         this.dependencyDeclarations = [];
@@ -16,7 +16,7 @@ class RegistryDSL{
 
     forDependencyParam(param){
         this.declarationInProcess ={
-            paramName = param
+            paramName: param
         };
         return this;
     }

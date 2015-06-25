@@ -2,7 +2,9 @@
  * Created by reharik on 6/10/15.
  */
 
-module.exports = function(Promise, invariant, gesConnection, logger) {
+module.exports = function(bluebird, invariant, gesConnection, logger) {
+    var Promise = bluebird;
+
     return function (streamName, skipTake) {
         invariant(
             streamName,

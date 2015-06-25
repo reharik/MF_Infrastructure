@@ -8,7 +8,7 @@
 
 
 module.exports = function(invariant,
-                          AggregateBase,
+                          AggregateRootBase,
                           lodash,
                           EventData,
                           appendToStreamPromise,
