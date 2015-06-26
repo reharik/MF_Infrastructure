@@ -1,7 +1,7 @@
 //var bs = require('../../bootstrap');
 
 
-module.exports = function (AggregateRootBase, gesEvent) {
+module.exports = function (AggregateRootBase, GesEvent) {
     return class TestAgg extends AggregateRootBase {
         constructor() {
             super();
@@ -24,12 +24,12 @@ module.exports = function (AggregateRootBase, gesEvent) {
         commandHandlers() {
             return {
                 'someCommand': function (command) {
-                    var vent1 = new Vent('someshite', null, null, {blah: command.value});
+                    var vent1 = new GesEvent('someshite', null, null, {blah: command.value});
                     this.raiseEvent(vent1);
                 },
                 'someOtherCommand': function (command) {
                     this.raiseEvent(vent2);
-                    var vent2 = new Vent('someOthershite', null, null, {blah: command.value});
+                    var vent2 = new GesEvent('someOthershite', null, null, {blah: command.value});
                 }
             }
         }

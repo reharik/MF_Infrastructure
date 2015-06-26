@@ -6,7 +6,6 @@
 module.exports = function(invariant) {
     return class AggregateRootBase {
         constructor() {
-            console.log('in agg root cstr')
             this._id;
             this._version = 0;
             this.uncommittedEvents = [];

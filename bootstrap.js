@@ -9,11 +9,8 @@ var bootstrap = {
         start: function () {
             this.container = {};
             if (_.isEmpty(this.container)) {
-                console.log('loading dependencies');
                 bootstrapper.initialize(x=>x.pathToJsonConfig('./package.json').complete());
-                //this.container = bootstrapper;
-            } else {
-                console.log('container already loaded');
+                this.container = bootstrapper;
             }
         },
         container:{}

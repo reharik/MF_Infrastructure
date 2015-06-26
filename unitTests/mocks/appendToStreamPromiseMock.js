@@ -3,16 +3,18 @@
  */
 
 var Promise = require('bluebird');
-var streamName='';
-var appendData={};
-module.exports = {
-    mock:function(_streamName, _appendData) {
-        streamName = _streamName;
-        appendData = _appendData;
-        return Promise.resolve({
-            streamName: streamName,
-            appendData: appendData
-        })
-    },
-    appendedData:  {streamName:streamName, appendData: appendData}
+module.exports = function(bluebird){
+    var streamName='';
+    var appendData={};
+    return {
+        mock:function(_streamName, _appendData) {
+            streamName = _streamName;
+            appendData = _appendData;
+            return Promise.resolve({
+                streamName: streamName,
+                appendData: appendData
+            })
+        },
+        appendedData:  {streamName:streamName, appendData: appendData}
+    }
 };

@@ -18,18 +18,26 @@ var container = function(){
     var getInstanceOf = function(_type){
         return bootstrapper.getInstanceOf(_type).instance;
     };
+    var whatDoIHave = function(){
+        return bootstrapper.whatDoIHave();
+    };
     return {
         initialize: initialize,
-        getInstanceOf: getInstanceOf
+        getInstanceOf: getInstanceOf,
+        whatDoIHave: whatDoIHave
     }
 }();
 
 
 class Bootstrapper{
     constructor(registryFunc) {
+        console.log('registryFunc');
+        console.log(registryFunc);
         this.dependencyGraph = [];
         var registryDSL = new RegistryDSL();
         var registry = registryFunc(registryDSL);
+        console.log('registry');
+        console.log(registry);
         // analze path to see if it incluedes the package.json or just the path.
         // for now presuming it has the path
         // also presuming from app root
@@ -50,10 +58,9 @@ class Bootstrapper{
                     invariant(this.pjson.internalDependencies[x] && this.pjson.internalDependencies[x].length>2,'Internal Dependency '+x+' must have a valid path');
                     var instance = require(path.join(appRoot + this.pjson.internalDependencies[x]));
                     return {name:x, resolved:false, instance: instance}}));
+        this.resolveOverriddenDependency();
         this.validateGraph();
         this.dependencyGraph = this.recurseTree(this.dependencyGraph);
-        console.log("this.dependencyGraph2");
-        console.log(this.dependencyGraph);
     }
 
     getKeys(obj){
@@ -90,7 +97,7 @@ class Bootstrapper{
         //console.log(item.instance);
         //console.log(fnArgs2);
         //console.log(map2);
-        console.log(map2);
+        //console.log(map2);
             var instance2 = item.instance.apply(item.instance, map2);
             var newVar = {
                 name: item.name,
@@ -105,18 +112,16 @@ class Bootstrapper{
     findDependencyFromGraph(dependencyName, callingFunction) {
         var dependency = this.dependencyGraph.find(x=>x.name == dependencyName);
         invariant(dependency,'Module '+callingFunction+' has a dependency that can not be resolved: '+dependencyName);
-        console.log(dependency);
+        //console.log(dependency);
         return dependency;
     }
 
-    //resolveOverriddenDependency(override) {
-    //    override.instance = require(override.path);
-    //    return {
-    //        name: override.name,
-    //        resolved: true,
-    //        instance: override.instance(fnArgs(override.instance).map(d => this.dependencyGraph.find(x=>x.name == d).instance))
-    //    };
-    //}
+    resolveOverriddenDependency() {
+        this.explicitOverrides.forEach(x=>{
+            _.remove(this.dependencyGraph, g=>g.name == x.paramName);
+            this.dependencyGraph.push({name:x.paramName, resolved:false, instance:require(path.join(appRoot + x.path))});
+        });
+    }
 
     getInstanceOf(_type){
         return this.dependencyGraph.find(x=>x.name == _type);
@@ -133,6 +138,10 @@ class Bootstrapper{
             invariant(x.name && x.name.length>1, 'Dependency must have a valid name property');
             invariant(x.instance && _.isFunction(x.instance), 'Dependency '+x.name+' does not have an instance that is a function');
         })
+    }
+
+    whatDoIHave(){
+        return this.dependencyGraph.map(x=>{return {name:x.name, instance:x.instance}});
     }
 }
 

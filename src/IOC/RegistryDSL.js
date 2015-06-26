@@ -22,9 +22,10 @@ module.exports = class RegistryDSL{
     }
 
     requireThisModule(path){
-        this.declarationInProcess.path;
+        this.declarationInProcess.path=path;
         this.dependencyDeclarations.push(this.declarationInProcess);
         this.declarationInProcess = null;
+        return this;
     }
 
     complete(){
