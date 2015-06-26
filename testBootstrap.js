@@ -14,6 +14,10 @@ var bootstrap = {
                         .forDependencyParam('testAgg').requireThisModule("/unitTests/mocks/testAgg")
                         .forDependencyParam('testAggNoCMDHandlers').requireThisModule("/unitTests/mocks/testAggNoCMDHandlers")
                         .forDependencyParam('testAggNoEventHandlers').requireThisModule("/unitTests/mocks/testAggNoEventHandlers")
+                        .forDependencyParam('TestEventHandler').requireThisModule("/unitTests/mocks/TestEventHandler")
+                        .forDependencyParam('gesConnection').requireThisModule("/unitTests/mocks/gesConnectionMock")
+                        .replace('lodash').withThis('_')
+                        .replace('bluebird').withThis('Promise')
                     .complete();
                 });
                 this.container = bootstrapper;

@@ -50,7 +50,7 @@ module.exports = function(NotificationEvent, appendToStreamPromise, expectIdempo
                     logger.debug('event data created: ' + appendData);
 
                     logger.trace('publishing notification');
-                    this.result = appendToStream('notification', appendData);
+                    this.result = appendToStreamPromise('notification', appendData);
                 }
             }
             // largely for testing purposes, sadly

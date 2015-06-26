@@ -3,9 +3,12 @@
  */
 
 module.exports = function(GesEvent) {
+    console.log('GesEvent');
+    console.log(GesEvent);
+    //console.log(GesEvent());
     return class NotificationEvent extends GesEvent {
         constructor(_notificationType, _message, _initialEvent) {
-            super('notificationEvent');
+            super();
             this.data = {
                 eventName: 'notificationEvent',
                 notificationType: _notificationType,

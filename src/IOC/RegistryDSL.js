@@ -6,7 +6,9 @@ module.exports = class RegistryDSL{
     constructor(){
         this._pathToJsonConfig;
         this.dependencyDeclarations = [];
+        this.renamedDeclarations = [];
         this.declarationInProcess;
+        this.renameInProgress;
     }
 
     pathToJsonConfig(path){
@@ -16,7 +18,7 @@ module.exports = class RegistryDSL{
 
     forDependencyParam(param){
         this.declarationInProcess ={
-            paramName: param
+            name: param
         };
         return this;
     }
@@ -28,10 +30,23 @@ module.exports = class RegistryDSL{
         return this;
     }
 
+    replace(name){
+        this.renameInProgress = {oldName: name};
+        return this;
+    }
+
+    withThis(name){
+        this.renameInProgress.name = name;
+        this.renamedDeclarations.push(this.renameInProgress);
+        this.renameInProgress=null;
+        return this;
+    }
+
     complete(){
         return {
             pathToJsonConfig:this._pathToJsonConfig,
-            dependencyDeclarations:this.dependencyDeclarations
+            dependencyDeclarations:this.dependencyDeclarations,
+            renamedDeclarations:this.renamedDeclarations
         };
     }
-}
+};

@@ -11,8 +11,8 @@ module.exports = function() {
         var _readStreamEventForwardShouldFail;
         var readStreamEventForwardResult;
         var subscribeToStream = function () {
-            this.subscription = new Subscription();
-            return this.subscription;
+            subscription = new Subscription();
+            return subscription;
         };
 
         var appendToStream = function (streamName, data, cb) {

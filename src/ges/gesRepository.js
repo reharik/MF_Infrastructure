@@ -9,13 +9,12 @@
 
 module.exports = function(invariant,
                           AggregateRootBase,
-                          lodash,
+                          _,
                           EventData,
                           appendToStreamPromise,
                           readStreamEventsForwardPromise,
                           streamNameStrategy,
                           logger) {
-    var _ = lodash;
     return function (_options) {
         logger.trace('constructing gesRepository');
         logger.debug('gesRepository options passed in ' + _options);

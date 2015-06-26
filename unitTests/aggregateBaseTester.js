@@ -33,8 +33,6 @@ describe('aggregateFunctionality', function() {
     describe('#CommandHandlers', function(){
         context('when newing up agg',function (){
             it('should make commandhandlers available at root', function () {
-                console.log('mut.someCommand');
-                console.log((mut.someCommand instanceof Function));
                 (mut.someCommand instanceof Function).must.be.true;
                 (mut.someOtherCommand instanceof Function).must.be.true;
             })

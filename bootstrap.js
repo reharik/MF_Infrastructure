@@ -9,7 +9,12 @@ var bootstrap = {
         start: function () {
             this.container = {};
             if (_.isEmpty(this.container)) {
-                bootstrapper.initialize(x=>x.pathToJsonConfig('./package.json').complete());
+                bootstrapper.initialize(x=>
+                    x.pathToJsonConfig('./package.json')
+                        .replace('lodash').withThis('_')
+                        .replace('bluebird').withThis('Promise')
+                        .complete()
+                );
                 this.container = bootstrapper;
             }
         },

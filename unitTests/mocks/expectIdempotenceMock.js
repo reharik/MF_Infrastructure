@@ -3,11 +3,9 @@
  */
 
 module.exports = function(){
-    return {
-        passes:false,
-        mock: function(){
-            return passes;
-        },
-        setPassesToTrue:function(){this.passes = true;}
+    return function(truth) {
+        return function(){
+            return truth;
+        }
     }
 };

@@ -2,8 +2,7 @@
  * Created by rharik on 6/18/15.
  */
 
-module.exports = function(config, invariant, lodash, GesEvent, gesConnection, logger) {
-    var _ = lodash;
+module.exports = function(config, invariant, _, GesEvent, gesConnection, logger) {
     return class gesDispatcher {
         constructor(_options) {
             logger.trace('constructing gesDispatcher base version');
@@ -19,11 +18,13 @@ module.exports = function(config, invariant, lodash, GesEvent, gesConnection, lo
                 this.options.handlers,
                 "Dispatcher requires at least one handler"
             );
+            this.connection = gesConnection();
         }
 
         startDispatching() {
             logger.info('startDispatching called');
-            var subscription = gesConnection.subscribeToStream(this.options.stream);
+
+            var subscription = this.connection.subscribeToStream(this.options.stream);
             logger.debug('subscription created: ' + subscription);
             subscription.on('event', function (payload) {
                 logger.info('event received by dispatcher: ' + payload);
@@ -80,4 +81,4 @@ module.exports = function(config, invariant, lodash, GesEvent, gesConnection, lo
 
 
     }
-}
+};
