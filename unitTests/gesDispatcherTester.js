@@ -3,27 +3,51 @@
  */
 
 require('must');
-var bootstrap = require('../testBootstrap');
-bootstrap.start();
-var GesEvent = bootstrap.container.getInstanceOf('GesEvent');
-var gesConnection = bootstrap.container.getInstanceOf('gesConnection')();
-
 
 describe('gesDispatcher', function() {
+    var bootstrap;
+    var GesEvent;
+    var gesConnection;
     var mod;
     var mut;
     var TestHandler;
     var testHandler;
     before(function(){
+        bootstrap = require('../testBootstrap');
+        bootstrap.start();
+        GesEvent = bootstrap.container.getInstanceOf('GesEvent');
+        gesConnection = bootstrap.container.getInstanceOf('gesConnection');
         mod = bootstrap.container.getInstanceOf('gesDispatcher');
         TestHandler = bootstrap.container.getInstanceOf('TestEventHandler');
-        testHandler = new TestHandler({gesConnection:gesConnection});
+        testHandler = new TestHandler();
         mut = new mod({handlers:[testHandler]});
 
     });
     beforeEach(function(){
        testHandler.clearEventsHandled();
+        gesConnection.clean();
     });
+
+    describe('#Instanciate Dispatcher', function() {
+        context('when instanciating dispatcher with no handlers', function () {
+            it('should throw proper error',  function () {
+
+                console.log('gesConnection');
+                //console.log(connection);
+                gesConnection.subscribeToStream();
+                gesConnection.getSubscription().on('fuck', function(data){console.log(data)});
+                gesConnection.appendToStream('fuck',{name:'FUCCKCKCK'},function(){console.log('hello')});
+
+                console.log("connection.getSubscription()1");
+                console.log(gesConnection.getSubscription());
+                var gesConnection2 = bootstrap.container.getInstanceOf('gesConnection');
+
+                console.log("connection.getSubscription()2");
+                console.log(gesConnection2.getSubscription());
+            })
+        });
+    });
+
 
     describe('#Instanciate Dispatcher', function() {
         context('when instanciating dispatcher with no handlers', function () {
@@ -51,9 +75,14 @@ describe('gesDispatcher', function() {
             it('should handle event',  function () {
                 mut.startDispatching();
 
-                var subscription = gesConnection.subscribeToStream();
+                console.log("testing connections");
+                console.log(gesConnection.getId());
+                console.log(mut.getConn().getId());
+
+                var subscription = gesConnection.getSubscription();
+                console.log(subscription);
                 var eventData = {
-                    Event:{EventType:'testEvent'},
+                    Event:{EventType:'someEvent'},
                     OriginalPosition:{},
                     OriginalEvent:{
                         Metadata:{eventTypeName:'someEvent'},
@@ -61,16 +90,13 @@ describe('gesDispatcher', function() {
                     }
 
                 };
-                console.log("here1");
                 subscription.emit('event', eventData);
                 testHandler.eventsHandled.length.must.equal(1);
-                console.log("testHandler.eventsHandled");
-                console.log(testHandler.eventsHandled);
             });
 
             it('should should emit the proper type',  function () {
                 mut.startDispatching();
-                var subscription = gesConnection.subscribeToStream();
+                var subscription = gesConnection.getSubscription();
                 var eventData = {
                     Event:{EventType:'testEvent'},
                     OriginalPosition:'the originalPosition',
@@ -81,12 +107,12 @@ describe('gesDispatcher', function() {
 
                 };
                 subscription.emit('event', eventData);
-                testHandler.eventsHandled[0].must.be.instanceof(gesEvent) ;
+                testHandler.eventsHandled[0].must.be.instanceof(GesEvent) ;
             });
 
             it('should all the expected values on it',  function () {
                 mut.startDispatching();
-                var subscription = gesConnection.subscribeToStream();
+                var subscription = gesConnection.getSubscription();
                 var eventData = {
                     Event:{EventType:'testEvent'},
                     OriginalPosition:'the originalPosition',
@@ -96,14 +122,10 @@ describe('gesDispatcher', function() {
                     }
 
                 };
-                console.log("subscription");
-                console.log(subscription);
-                subscription.on('event', function(){console.lot("WHTSTHFDIUV")});
                 subscription.emit('event', eventData);
                 var eventsHandled = testHandler.eventsHandled[0];
-                console.log('eventsHandled');
                 console.log(eventsHandled);
-                eventsHandled.eventTypeName.must.equal('someEvent');
+                eventsHandled.eventName.must.equal('someEvent');
                 eventsHandled.originalPosition.must.equal('the originalPosition');
                 eventsHandled.metadata.eventTypeName.must.equal('someEvent');
                 eventsHandled.data.some.must.equal('data');
@@ -113,7 +135,7 @@ describe('gesDispatcher', function() {
         context('when calling StartDispatching with filter breaking vars', function () {
             it('should not post event to handler for system event',  function () {
                 mut.startDispatching();
-                var subscription = gesConnection.subscribeToStream();
+                var subscription = gesConnection.getSubscription();
                 var eventData = {
                     Event:{EventType:'$testEvent'},
                     OriginalPosition:{},

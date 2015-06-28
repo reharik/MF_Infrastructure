@@ -2,38 +2,23 @@
 // * Created by rharik on 6/19/15.
 // */
 //
-//global.container = null;
-//var bs = require('../bootstrap');
-//bs.start();
-//bs.inject([
-//    {expectIdempotence:'./unitTests/mocks/expectIdempotenceMock'},
-//    {gesConnection:'./unitTests/mocks/gesConnectionMock'},
-//    {TestEventHandler:'./unitTests/mocks/TestEventHandler'}
-//
-//]);
-//
-//require('must');
-//var expectIdempotence  = global.container.expectIdempotence;
-//var gesConnection = global.container.gesConnection;
-//var TestHandler = global.container.TestEventHandler;
-//
-//var gesEvent = global.container.gesEvent;
-//var uuid = global.container.uuid;
-//
-
-
 require('must');
-var bootstrap = require('../testBootstrap');
-bootstrap.start();
-var TestHandler = bootstrap.container.getInstanceOf('TestEventHandler');
-var GesEvent = bootstrap.container.getInstanceOf('GesEvent');
-var uuid = bootstrap.container.getInstanceOf('uuid');
-var expectIdempotence = require('./mocks/expectIdempotenceMock')();
-
 
 describe('gesEventHandlerBase', function() {
     var mut;
+    var TestHandler;
+    var GesEvent;
+    var uuid;
+    var expectIdempotence;
+    var bootstrap;
+
     before(function(){
+        bootstrap = require('../testBootstrap');
+        bootstrap.start();
+        TestHandler = bootstrap.container.getInstanceOf('TestEventHandler');
+        GesEvent = bootstrap.container.getInstanceOf('GesEvent');
+        uuid = bootstrap.container.getInstanceOf('uuid');
+        expectIdempotence = require('./mocks/expectIdempotenceMock')();
         mut = new TestHandler();
     });
     beforeEach(function(){
@@ -61,7 +46,7 @@ describe('gesEventHandlerBase', function() {
                 bootstrap.container.inject({name:'expectIdempotency', instance:expectIdempotence(true)});
                 var eventData =new GesEvent('someException',{},{eventTypeName:'someException'},{'some':'data'});
                 var result = await mut.handleEvent(eventData);
-                JSON.parse(result.data.events[0].Data).data.notificationType.must.equal('Failure');
+                JSON.parse(result.data.events[0].Data).notificationType.must.equal('Failure');
             })
         });
 
@@ -70,7 +55,7 @@ describe('gesEventHandlerBase', function() {
                 bootstrap.container.inject({name:'expectIdempotency', instance:expectIdempotence(true)});
                 var eventData =new GesEvent('someEvent',{},{eventTypeName:'someEvent'},{'some':'data'});
                 var result = await mut.handleEvent(eventData);
-                JSON.parse(result.data.events[0].Data).data.notificationType.must.equal('Success');
+                JSON.parse(result.data.events[0].Data).notificationType.must.equal('Success');
             })
         });
 
@@ -89,14 +74,12 @@ describe('gesEventHandlerBase', function() {
                 var eventData =new GesEvent('someEvent',{},{eventTypeName:'someEvent', continuationId:continuationId},{'some':'data'});
                 var result = await mut.handleEvent(eventData);
                 result.data.expectedVersion.must.equal(-2);
-                console.log(result.data.events[0].Data);
                 result.data.events[0].EventId.length.must.equal(36);
                 result.data.events[0].Type.must.equal('notificationEvent');
                 JSON.parse(result.data.events[0].Data).eventName.must.equal('notificationEvent');
-                JSON.parse(result.data.events[0].Data).data.initialEvent.eventName.must.equal('someEvent');
+                JSON.parse(result.data.events[0].Data).initialEvent.eventName.must.equal('someEvent');
                 JSON.parse(result.data.events[0].Metadata).continuationId.must.equal(continuationId);
             })
         });
-//
     });
 });

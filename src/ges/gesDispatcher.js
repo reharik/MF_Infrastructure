@@ -18,14 +18,16 @@ module.exports = function(config, invariant, _, GesEvent, gesConnection, logger)
                 this.options.handlers,
                 "Dispatcher requires at least one handler"
             );
-            this.connection = gesConnection();
+            this.connection = gesConnection;
+        }
+        getConn(){
+            return this.connection;
         }
 
         startDispatching() {
             logger.info('startDispatching called');
 
             var subscription = this.connection.subscribeToStream(this.options.stream);
-            logger.debug('subscription created: ' + subscription);
             subscription.on('event', function (payload) {
                 logger.info('event received by dispatcher: ' + payload);
                 this.handleEvent(payload);

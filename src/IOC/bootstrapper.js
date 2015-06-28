@@ -20,8 +20,8 @@ var container = function(){
         //console.log(_type);
         return bootstrapper.getInstanceOf(_type).instance;
     };
-    var whatDoIHave = function(){
-        return bootstrapper.whatDoIHave();
+    var whatDoIHave = function(options){
+        return bootstrapper.whatDoIHave(options);
     };
     var inject = function(dependencies){
         if(!_.isArray(dependencies)){ dependencies = [dependencies];}
@@ -53,11 +53,26 @@ class Bootstrapper{
     }
 
     getInstanceOf(_type){
-        return this.dependencyGraph.find(x=>x.name == _type);
+         for(let t of this.dependencyGraph){
+            if(t.name === _type){
+                return t;
+            }
+        }
+        //console.log("returned value "+returnedValue.name);
+        //var find = this.dependencyGraph.find(x=>x.name == _type);
+        //var find2 = this.dependencyGraph.find(x=>x.name == _type);
+        //console.log("objects are equal " + find===find2)
+        //return this.dependencyGraph.find(x=>x.name == _type);
     }
 
-    whatDoIHave(){
-        return this.dependencyGraph.map(x=>{return {name:x.name, resolved:x.resolved}});//, instance:x.instance}});
+    whatDoIHave(options){
+        return this.dependencyGraph.map(x=>{
+            var dependency = {name: x.name};
+            if(options.showResolved) { dependency.resolved = x.resolved ;}
+            if(options.showInstance && x.internal) { dependency.instance = x.instance;}
+            if(options.showInstanceForAll) { dependency.instance = x.instance;}
+            return dependency
+        });
     }
 
     inject(dependencies){
@@ -102,7 +117,7 @@ var recursion = function(_registry){
                 invariant(pjson.internalDependencies[x] && pjson.internalDependencies[x].length > 2,
                     'Internal Dependency ' + x + ' must have a valid path');
                 var instance = require(path.join(appRoot + pjson.internalDependencies[x]));
-                graph.push({name: x, resolved: false, instance: instance})
+                graph.push({name: x, resolved: false, instance: instance, internal:true})
             });
     };
 
@@ -134,9 +149,12 @@ var recursion = function(_registry){
     };
 
     var findDependencyFromGraph = function(dependencyName, callingFunction) {
-        var dependency = graph.find(x=>x.name == dependencyName);
-        invariant(dependency,'Module '+callingFunction+' has a dependency that can not be resolved: '+dependencyName);
-        return dependency;
+        for(let d of graph){
+            if(d.name === dependencyName){
+                return d;
+            }
+        }
+        throw new Error('Module '+callingFunction+' has a dependency that can not be resolved: '+dependencyName);
     };
 
     var processRegistryFile = function() {
@@ -144,7 +162,13 @@ var recursion = function(_registry){
             inject(x);
         });
         registry.renamedDeclarations.forEach(x=> {
-            var target = graph.find(i=>i.name == x.oldName);
+            var target;
+            for(let d of graph){
+                if(d.name === x.oldName){
+                    target = d;
+                    break;
+                }
+            }
             if(target) {target.name = x.name}
         });
     };
@@ -171,11 +195,15 @@ var recursion = function(_registry){
             dependency.instance = function () {return dependency.instance; };
         }
 
-        var target = graph.find(x=>x.name == dependency.name);
+        var target;
+        for(let d of graph){
+            if(d.name === dependency.name){
+                target = d;
+                break;
+            }
+        }
         if(target) {updateDependency(target, dependency);}
         else{addNewDependency(dependency);}
-
-
     };
 
     return {

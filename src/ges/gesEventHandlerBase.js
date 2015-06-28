@@ -35,10 +35,9 @@ module.exports = function(NotificationEvent, appendToStreamPromise, expectIdempo
             } finally {
                 if (this.responseMessage) {
                     logger.trace('beginning to process responseMessage');
-
                     var responseEvent = new EventData(this.responseMessage.id,
-                        this.responseMessage.eventName,
-                        this.responseMessage,
+                        this.responseMessage.data.eventName,
+                        this.responseMessage.data,
                         {"continuationId": this.continuationId});
 
                     logger.debug('response event created: ' + responseEvent);

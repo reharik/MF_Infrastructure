@@ -3,22 +3,39 @@
  */
 
 
-module.exports = function() {
+module.exports = function(uuid) {
     var Subscription = require('./SubscriptionMock');
-    return function gesConnectionMock() {
+
+    return function gesClientMock(opts) {
         var subscription;
         var _appendToStreamShouldFail;
         var _readStreamEventForwardShouldFail;
         var readStreamEventForwardResult;
+        var val = opts.val;
+        var id = uuid.v1();
+        var clean = function(){
+            console.log('cleaning gesClient');
+            subscription= null;
+            _appendToStreamShouldFail = false;
+            _readStreamEventForwardShouldFail = false;
+            readStreamEventForwardResult = null;
+        };
+
         var subscribeToStream = function () {
+            console.log('mock stream subscription');
             subscription = new Subscription();
             return subscription;
         };
 
+        var getSubscription = function(){ return subscription; };
+        var getId = function(){ return id; };
+
         var appendToStream = function (streamName, data, cb) {
             console.log('mock append');
-
+            if(!subscription){subscription = subscribeToStream()}
             var results = {streamName: streamName, data: data};
+            subscription.emit(streamName,results);
+
             if (_appendToStreamShouldFail) {
                 cb(results);
             }
@@ -48,6 +65,9 @@ module.exports = function() {
         };
 
         return {
+            clean:clean,
+            getId:getId,
+            getSubscription:getSubscription,
             subscribeToStream: subscribeToStream,
             appendToStream: appendToStream,
             readStreamEventsForward: readStreamEventsForward,
@@ -56,6 +76,6 @@ module.exports = function() {
             appendToStreamShouldFail: appendToStreamShouldFail
         }
 
-    }
+    };
 };
 

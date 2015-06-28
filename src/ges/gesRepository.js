@@ -15,6 +15,7 @@ module.exports = function(invariant,
                           readStreamEventsForwardPromise,
                           streamNameStrategy,
                           logger) {
+
     return function (_options) {
         logger.trace('constructing gesRepository');
         logger.debug('gesRepository options passed in ' + _options);
@@ -26,8 +27,8 @@ module.exports = function(invariant,
             writePageSize: 2,
             readPageSize: 1
         };
-        _.assign(options, _options);
-        logger.debug('gesRepository options after merge ' + this.options);
+        _.assign(options, _options || {});
+        logger.debug('gesRepository options after merge ' + options);
 
         invariant(
             options.eventTypeHeader,
@@ -60,7 +61,7 @@ module.exports = function(invariant,
             var sliceCount;
             try {
                 invariant(
-                    (aggregateType.prototype instanceof AggregateBase),
+                    (aggregateType.prototype instanceof AggregateRootBase),
                     "aggregateType must inherit from AggregateBase"
                 );
                 invariant(
@@ -130,7 +131,7 @@ module.exports = function(invariant,
             var result;
             try {
                 invariant(
-                    (aggregate instanceof AggregateBase),
+                    (aggregate instanceof AggregateRootBase),
                     "aggregateType must inherit from AggregateBase"
                 );
 
@@ -148,7 +149,7 @@ module.exports = function(invariant,
                 logger.debug('merged metadata: ' + metadata);
 
                 streamName = streamNameStrategy(aggregate.constructor.name, aggregate.id());
-                logger.debug('gesRepo calling getById with params:' + aggregateType + ', ' + id + ', ' + version);
+                logger.debug('gesRepo calling save with params:' + aggregate + ', ' + commitId + ', ' + _metadata);
                 logger.trace('retrieving uncommited events');
                 newEvents = aggregate.getUncommittedEvents();
 

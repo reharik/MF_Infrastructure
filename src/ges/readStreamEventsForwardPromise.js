@@ -15,14 +15,14 @@ module.exports = function(Promise, invariant, gesConnection, logger) {
 
         logger.trace('wrapping readStreamEventsForward in Promise');
         return new Promise(function (resolve, reject) {
-            gesConnection().readStreamEventsForward(streamName, skipTake, function (err, results) {
+            gesConnection.readStreamEventsForward(streamName, skipTake, function (err, results) {
                 logger.trace('readStreamEventsForward callback');
                 if (err) {
                     logger.debug('rejecting readStreamEventsForward Promise with error message: ' + err);
                     reject(err);
                 } else {
-                    logger.debug('resolving readStreamEventsForward Promise with response: ' + result);
-                    resolve(result);
+                    logger.debug('resolving readStreamEventsForward Promise with response: ' + results);
+                    resolve(results);
                 }
             });
         })
