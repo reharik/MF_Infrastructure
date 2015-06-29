@@ -14,6 +14,7 @@ var container = function(){
     var bootstrapper;
     var initialize = function(registryFunc) {
         bootstrapper = new Bootstrapper(registryFunc);
+        return this;
     };
     var getInstanceOf = function(_type){
         //console.log(bootstrapper.whatDoIHave());
@@ -140,10 +141,10 @@ var recursion = function(_registry){
 
     var resolveDependency = function(item) {
         if (item.resolved) { return; }
-
         var itemsDependencies = [];
         fnArgs(item.instance).forEach(d=> itemsDependencies.push(findDependencyFromGraph(d, item.name).instance));
         item.resolved = true;
+
         var resolvedInstance = itemsDependencies.length>0 ? item.instance.apply(item.instance, itemsDependencies) : item.instance();
         item.instance = resolvedInstance;
     };

@@ -1,5 +1,5 @@
 {
   "eventstore":{
-    "ip":"localhost"
+    "ip":"172.0.0.1"
   }
 }

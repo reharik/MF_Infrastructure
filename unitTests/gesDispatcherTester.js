@@ -5,7 +5,7 @@
 require('must');
 
 describe('gesDispatcher', function() {
-    var bootstrap;
+    var container;
     var GesEvent;
     var gesConnection;
     var mod;
@@ -13,12 +13,11 @@ describe('gesDispatcher', function() {
     var TestHandler;
     var testHandler;
     before(function(){
-        bootstrap = require('../testBootstrap');
-        bootstrap.start();
-        GesEvent = bootstrap.container.getInstanceOf('GesEvent');
-        gesConnection = bootstrap.container.getInstanceOf('gesConnection');
-        mod = bootstrap.container.getInstanceOf('gesDispatcher');
-        TestHandler = bootstrap.container.getInstanceOf('TestEventHandler');
+        container = require('../testBootstrap');
+        GesEvent = container.getInstanceOf('GesEvent');
+        gesConnection = container.getInstanceOf('gesConnection');
+        mod = container.getInstanceOf('gesDispatcher');
+        TestHandler = container.getInstanceOf('TestEventHandler');
         testHandler = new TestHandler();
         mut = new mod({handlers:[testHandler]});
 
@@ -40,7 +39,7 @@ describe('gesDispatcher', function() {
 
                 console.log("connection.getSubscription()1");
                 console.log(gesConnection.getSubscription());
-                var gesConnection2 = bootstrap.container.getInstanceOf('gesConnection');
+                var gesConnection2 = container.getInstanceOf('gesConnection');
 
                 console.log("connection.getSubscription()2");
                 console.log(gesConnection2.getSubscription());

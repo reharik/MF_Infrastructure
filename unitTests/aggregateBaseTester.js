@@ -1,7 +1,7 @@
 
 
 require('must');
-var bootstrap;
+var container;
 var testAgg;
 var testAggNoCMDHandlers;
 var testAggNoEventHandlers;
@@ -11,14 +11,14 @@ describe('aggregateFunctionality', function() {
     var mut;
 
     before(function(){
-        bootstrap = require('../testBootstrap');
-        bootstrap.start();
-        testAgg = bootstrap.container.getInstanceOf('testAgg');
-        testAggNoCMDHandlers = bootstrap.container.getInstanceOf('testAggNoCMDHandlers');
-        testAggNoEventHandlers = bootstrap.container.getInstanceOf('testAggNoEventHandlers');
+        container = require('../testBootstrap');
+        testAgg = container.getInstanceOf('testAgg');
+        testAggNoCMDHandlers = container.getInstanceOf('testAggNoCMDHandlers');
+        testAggNoEventHandlers = container.getInstanceOf('testAggNoEventHandlers');
     });
 
     beforeEach(function(){
+        console.log(testAgg);
         mut = new testAgg();
     });
 

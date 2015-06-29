@@ -3,7 +3,7 @@
  */
 
 require('must');
-var bootstrap;
+var container;
 
 
 describe('getEventStoreRepository', function() {
@@ -18,14 +18,13 @@ describe('getEventStoreRepository', function() {
     var GesEvent;
 
     before(function(){
-        bootstrap = require('../testBootstrap');
-        bootstrap.start();
-        streamNameStrategy = bootstrap.container.getInstanceOf('streamNameStrategy');
-        gesConnection = bootstrap.container.getInstanceOf('gesConnection');
-        uuid = bootstrap.container.getInstanceOf('uuid');
-        TestAgg = bootstrap.container.getInstanceOf('testAgg');
-        GesEvent = bootstrap.container.getInstanceOf('GesEvent');
-        mut = bootstrap.container.getInstanceOf('gesRepository')();
+        container = require('../testBootstrap');
+        streamNameStrategy = container.getInstanceOf('streamNameStrategy');
+        gesConnection = container.getInstanceOf('gesConnection');
+        uuid = container.getInstanceOf('uuid');
+        TestAgg = container.getInstanceOf('testAgg');
+        GesEvent = container.getInstanceOf('GesEvent');
+        mut = container.getInstanceOf('gesRepository')();
     });
 
     beforeEach(function(){

@@ -10,14 +10,13 @@ describe('gesEventHandlerBase', function() {
     var GesEvent;
     var uuid;
     var expectIdempotence;
-    var bootstrap;
+    var container;
 
     before(function(){
-        bootstrap = require('../testBootstrap');
-        bootstrap.start();
-        TestHandler = bootstrap.container.getInstanceOf('TestEventHandler');
-        GesEvent = bootstrap.container.getInstanceOf('GesEvent');
-        uuid = bootstrap.container.getInstanceOf('uuid');
+        container = require('../testBootstrap');
+        TestHandler = container.getInstanceOf('TestEventHandler');
+        GesEvent = container.getInstanceOf('GesEvent');
+        uuid = container.getInstanceOf('uuid');
         expectIdempotence = require('./mocks/expectIdempotenceMock')();
         mut = new TestHandler();
     });
@@ -34,7 +33,7 @@ describe('gesEventHandlerBase', function() {
         });
         context('when calling handler that throws an exception', function () {
             it('should not process event', async function () {
-                bootstrap.container.inject({name:'expectIdempotency', instance:expectIdempotence(false)});
+                container.inject({name:'expectIdempotency', instance:expectIdempotence(false)});
                 var eventData =new GesEvent('someException',{},{eventTypeName:'someException'},{'some':'data'});
                 var result = await mut.handleEvent(eventData);
                 mut.eventsHandled.length.must.equal(0);
@@ -43,7 +42,7 @@ describe('gesEventHandlerBase', function() {
 
         context('when calling handler that throws an exception', function () {
             it('should send proper notification event', async function () {
-                bootstrap.container.inject({name:'expectIdempotency', instance:expectIdempotence(true)});
+                container.inject({name:'expectIdempotency', instance:expectIdempotence(true)});
                 var eventData =new GesEvent('someException',{},{eventTypeName:'someException'},{'some':'data'});
                 var result = await mut.handleEvent(eventData);
                 JSON.parse(result.data.events[0].Data).notificationType.must.equal('Failure');
@@ -52,7 +51,7 @@ describe('gesEventHandlerBase', function() {
 
         context('when calling handler that DOES NOT throw an exception', function () {
             it('should send proper notification event', async function () {
-                bootstrap.container.inject({name:'expectIdempotency', instance:expectIdempotence(true)});
+                container.inject({name:'expectIdempotency', instance:expectIdempotence(true)});
                 var eventData =new GesEvent('someEvent',{},{eventTypeName:'someEvent'},{'some':'data'});
                 var result = await mut.handleEvent(eventData);
                 JSON.parse(result.data.events[0].Data).notificationType.must.equal('Success');
@@ -61,7 +60,7 @@ describe('gesEventHandlerBase', function() {
 
         context('when calling handler that DOES NOT throws an exception', function () {
             it('should process event', async function () {
-                bootstrap.container.inject({name:'expectIdempotency', instance:expectIdempotence(true)});
+                container.inject({name:'expectIdempotency', instance:expectIdempotence(true)});
                 var eventData =new GesEvent('someEvent',{},{eventTypeName:'someEvent'},{'some':'data'});
                 var result = await mut.handleEvent(eventData);
                 mut.eventsHandled.length.must.equal(1);
@@ -69,7 +68,7 @@ describe('gesEventHandlerBase', function() {
         });
         context('when calling handler is successful', function () {
             it('should have proper properties on notification event', async function () {
-                bootstrap.container.inject({name:'expectIdempotency', instance:expectIdempotence(true)});
+                container.inject({name:'expectIdempotency', instance:expectIdempotence(true)});
                 var continuationId = uuid.v1();
                 var eventData =new GesEvent('someEvent',{},{eventTypeName:'someEvent', continuationId:continuationId},{'some':'data'});
                 var result = await mut.handleEvent(eventData);
