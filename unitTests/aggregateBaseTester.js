@@ -12,6 +12,8 @@ describe('aggregateFunctionality', function() {
 
     before(function(){
         container = require('../testBootstrap');
+        container = new container.container();
+        console.log(container);
         testAgg = container.getInstanceOf('testAgg');
         testAggNoCMDHandlers = container.getInstanceOf('testAggNoCMDHandlers');
         testAggNoEventHandlers = container.getInstanceOf('testAggNoEventHandlers');
