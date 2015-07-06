@@ -6,7 +6,7 @@ module.exports = function() {
     return function EventData(eventId, type, data, metadata) {
         metadata = metadata || {};
         data = JSON.stringify(data || {});
-        metadata = JSON.stringify(metadata);
+        metadata = JSON.stringify(metadata||{});
         return {
             EventId: eventId,
             Type: type,

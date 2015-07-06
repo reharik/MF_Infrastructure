@@ -7,8 +7,9 @@ module.exports = function(gesEventHandlerBase) {
     return class TestEventHandler extends gesEventHandlerBase {
         constructor() {
             super();
-            this.handlesEvents = ['someEvent'];
-            this.eventsHandled = []
+            this.handlesEvents = ['someEvent', 'testingEvent'];
+            this.eventsHandled = [];
+            this.eventHandlerName = 'TestEventHandler';
         }
 
         someEvent(vnt) {
@@ -17,6 +18,10 @@ module.exports = function(gesEventHandlerBase) {
 
         someException(vnt) {
             throw(new Error());
+        }
+
+        testingEvent(vnt){
+            this.eventsHandled.push(vnt);
         }
 
         clearEventsHandled() {

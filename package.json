@@ -12,8 +12,10 @@
   "license": "MIT",
   "node": ">=0.12.0",
   "dependencies": {
+    "JSON": "^1.0.0",
     "bluebird": "^2.9.27",
     "co": "^4.5.4",
+    "colors": "^1.1.2",
     "config": "^1.14.0",
     "fn-args": "^1.0.0",
     "ges-client": "^0.9.1",

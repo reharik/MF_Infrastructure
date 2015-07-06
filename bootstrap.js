@@ -8,4 +8,5 @@ module.exports =  new container(x=>
         x.pathToPackageJson('/package.json')
             .replace('lodash').withThis('_')
             .replace('bluebird').withThis('Promise')
+            .forDependencyParam('TestEventHandler').requireThisInternalModule("/unitTests/mocks/TestEventHandler")
             .complete());

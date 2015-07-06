@@ -2,7 +2,7 @@
  * Created by rharik on 6/18/15.
  */
 
-module.exports = function(config, invariant, _, GesEvent, gesConnection, logger) {
+module.exports = function(config, invariant, _, GesEvent, gesclient, gesConnection, logger, JSON) {
     return class gesDispatcher {
         constructor(_options) {
             logger.trace('constructing gesDispatcher base version');
@@ -24,18 +24,36 @@ module.exports = function(config, invariant, _, GesEvent, gesConnection, logger)
             return this.connection;
         }
 
+        setMetadata() {
+            var setData = {
+                expectedMetastreamVersion: -1
+                , metadata: gesclient.createStreamMetadata({
+                    acl: {
+                        readRoles: gesclient.systemRoles.all
+                    }
+                })
+                , auth: {
+                    username: gesclient.systemUsers.admin
+                    , password: gesclient.systemUsers.defaultAdminPassword
+                }
+            };
+
+            this.connection.setStreamMetadata('$all', setData)
+        }
+
         startDispatching() {
             logger.info('startDispatching called');
-
-            var subscription = this.connection.subscribeToStream(this.options.stream);
+            this.setMetadata();
+            var subscription = this.connection.subscribeToAllFrom();
             subscription.on('event', function (payload) {
-                logger.info('event received by dispatcher: ' + payload);
+                logger.info('event received by dispatcher');
                 this.handleEvent(payload);
                 logger.info('event processed by dispatcher');
             }.bind(this))
         }
 
         handleEvent(payload) {
+            console.log(payload.OriginalEvent.Metadata[this.options.targetTypeName]);
             logger.debug('filtering event before processing');
             if (!this.filterEvents(payload)) {
                 logger.trace('event filtered out by dispatcher');
@@ -46,7 +64,7 @@ module.exports = function(config, invariant, _, GesEvent, gesConnection, logger)
                 payload.OriginalPosition,
                 payload.OriginalEvent.Metadata,
                 payload.OriginalEvent.Data);
-            logger.info('event transfered into gesEvent: ' + vent);
+            logger.info('event transfered into gesEvent: '+JSON.stringify(vent));
 
             logger.info('looping through event handlers');
             this.options.handlers.forEach(h=> {
@@ -73,11 +91,16 @@ module.exports = function(config, invariant, _, GesEvent, gesConnection, logger)
                 return false;
             }
             logger.trace('event has metadata');
-            logger.trace('filtering event for empty adata');
+            logger.trace('filtering event for empty data');
             if (_.isEmpty(payload.OriginalEvent.Data)) {
                 return false;
             }
             logger.trace('event has data');
+            logger.trace('filtering event for targetTypeName');
+            if (_.isEmpty(payload.OriginalEvent.Metadata[this.options.targetTypeName])) {
+                return false;
+            }
+            logger.trace('event has proper targetTypeName');
             return true;
         }
 
