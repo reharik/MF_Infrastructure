@@ -1,14 +1,11 @@
 /**
  * Created by rharik on 6/23/15.
  */
-var _container = require('dependz');
+var container = require('./src/dependz/Container');
 
-module.exports = {
-    container: container ? container
-        : new _container(x=>
-        x.pathToPackageJson('../package.json')
-            .forDependencyParam('logger').requireThisInternalModule('./loggerMock')
+
+module.exports =  new container(x=>
+        x.pathToPackageJson('/package.json')
             .replace('lodash').withThis('_')
             .replace('bluebird').withThis('Promise')
-            .complete())
-};
+            .complete());

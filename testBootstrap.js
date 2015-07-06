@@ -4,7 +4,7 @@
 var container = require('./src/dependz/Container');
 
 module.exports = new container(x=>
-        x.pathToPackageJson('../package.json')
+        x.pathToPackageJson('/package.json')
         .forDependencyParam('testAgg').requireThisInternalModule("/unitTests/mocks/testAgg")
         .forDependencyParam('testAggNoCMDHandlers').requireThisInternalModule("/unitTests/mocks/testAggNoCMDHandlers")
         .forDependencyParam('testAggNoEventHandlers').requireThisInternalModule("/unitTests/mocks/testAggNoEventHandlers")

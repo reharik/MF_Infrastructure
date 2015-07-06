@@ -4,6 +4,8 @@
 
 var invariant = require('invariant');
 var Dependency = require('./Dependency');
+var path = require('path');
+var appRoot = path.resolve('./');
 
 module.exports = class RegistryDSL{
     constructor(){
@@ -14,9 +16,9 @@ module.exports = class RegistryDSL{
         this._renameInProgress;
     }
 
-    pathToPackageJson(path){
-        invariant(path,'Path to package.json must be a valid path');
-        this._pathToPackageJson = path;
+    pathToPackageJson(_path){
+        invariant(_path,'Path to package.json must be a valid path');
+        this._pathToPackageJson = path.join(appRoot + _path);
         return this;
     }
 
@@ -37,8 +39,8 @@ module.exports = class RegistryDSL{
         return this;
     }
 
-    requireThisInternalModule(path){
-        this.requireThisModule(path,true);
+    requireThisInternalModule(_path){
+        this.requireThisModule(_path ,true);
         return this;
     }
 

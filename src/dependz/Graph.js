@@ -2,10 +2,8 @@
  * Created by rharik on 6/30/15.
  */
 
-var path = require('path');
 var invariant = require('invariant');
 var Dependency = require('./Dependency');
-var appRoot = path.resolve('./');
 var _ = require('lodash');
 
 module.exports = class Graph{
@@ -25,6 +23,14 @@ module.exports = class Graph{
             if(i.name === dependencyName){
                 return i;
             }
+        }
+        try {
+            var tryingRequire = require(dependencyName);
+            if (tryingRequire) {
+                return tryingRequire;
+            }
+        }catch(ex){
+            //swallow, just a hail mary to resolve
         }
     }
 
@@ -52,7 +58,7 @@ module.exports = class Graph{
         }
         if(pjson.internalDependencies) {
             Object.keys(pjson.internalDependencies).forEach(x=> {
-                this._items.push(new Dependency(x, path.join(appRoot + pjson.internalDependencies[x]), true));
+                this._items.push(new Dependency(x, pjson.internalDependencies[x], true));
             });
         }
     }

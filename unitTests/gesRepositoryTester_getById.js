@@ -53,8 +53,8 @@ describe('getEventStoreRepository', function() {
                     IsEndOfStream: false
                 };
                 gesConnection.readStreamEventForwardShouldReturnResult(result);
-                var result = await mut.getById(TestAgg,uuid.v1(),0);
-                    result.must.be.instanceof(TestAgg);
+                var results = await mut.getById(TestAgg,uuid.v1(),0);
+                results.must.be.instanceof(TestAgg);
             })
         });
         context('when calling getById with multiple events returned',function (){

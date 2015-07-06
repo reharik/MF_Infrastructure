@@ -4,18 +4,31 @@
 
 var invariant = require('invariant');
 var fnArgs = require('fn-args');
+var _path = require('path');
+var appRoot = _path.resolve('./');
 
 module.exports = class Dependency{
-    constructor(name, path, internal){
+    constructor(name, path, internal, resolvedInstance){
         this.name = name;
         this.path = path;
         this.internal = internal || false;
-        invariant(this.name && this.name.length > 1, 'Dependency must have a valid name');
-        invariant(this.path && this.path.length > 1,
+        invariant(this.name, 'Dependency must have a valid name');
+        invariant(this.path || resolvedInstance,
             'Dependency ' + this.name + ' must have a valid path: '+this.path);
 
-        var item = require(path);
-        this.wrappedInstance = internal ? item : function () {return item};
+        if(resolvedInstance){
+            this.resolvedInstance = resolvedInstance;
+            this.wrappedInstance = function(){return resolvedInstance;}
+            return;
+        }
+        if (internal) {
+            var resolvedPath = _path.join(appRoot, this.path);
+            this.wrappedInstance = require(resolvedPath);
+        } else {
+            this.wrappedInstance = function () {
+                return require(this.path);
+            };
+        }
         this._children;
         this.resolvedInstance;
     }

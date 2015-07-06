@@ -47,6 +47,9 @@ module.exports = function(invariant) {
             this.uncommittedEvents = [];
         }
 
+        static isAggregateBase() {
+            return true;
+        }
         isAggregateBase() {
             return true;
         }

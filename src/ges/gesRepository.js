@@ -61,7 +61,7 @@ module.exports = function(invariant,
             var sliceCount;
             try {
                 invariant(
-                    (aggregateType.prototype instanceof AggregateRootBase),
+                    (aggregateType.isAggregateBase()),
                     "aggregateType must inherit from AggregateBase"
                 );
                 invariant(
@@ -131,7 +131,7 @@ module.exports = function(invariant,
             var result;
             try {
                 invariant(
-                    (aggregate instanceof AggregateRootBase),
+                    (aggregate.isAggregateBase && aggregate.isAggregateBase()),
                     "aggregateType must inherit from AggregateBase"
                 );
 
