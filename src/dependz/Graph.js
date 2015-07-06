@@ -53,12 +53,12 @@ module.exports = class Graph{
         invariant(pjson,'You must provide a json object to build graph from');
         if(pjson.dependencies){
             Object.keys(pjson.dependencies).forEach(x=> {
-                this._items.push(new Dependency(x.replace(/-/g, ''), x));
+                this._items.push(new Dependency({name:x.replace(/-/g, ''), path:x}));
             });
         }
         if(pjson.internalDependencies) {
             Object.keys(pjson.internalDependencies).forEach(x=> {
-                this._items.push(new Dependency(x, pjson.internalDependencies[x], true));
+                this._items.push(new Dependency({name:x, path:pjson.internalDependencies[x], internal:true}));
             });
         }
     }

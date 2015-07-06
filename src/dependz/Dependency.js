@@ -8,29 +8,26 @@ var _path = require('path');
 var appRoot = _path.resolve('./');
 
 module.exports = class Dependency{
-    constructor(name, path, internal, resolvedInstance){
-        this.name = name;
-        this.path = path;
-        this.internal = internal || false;
+    constructor(options){
+        this.name = options.name;
+        this.path = options.path;
+        this.internal = options.internal || false;
+        this.resolvedInstance = options.resolvedInstance;
+        this._children;
         invariant(this.name, 'Dependency must have a valid name');
-        invariant(this.path || resolvedInstance,
+        invariant(this.path || this.resolvedInstance,
             'Dependency ' + this.name + ' must have a valid path: '+this.path);
 
-        if(resolvedInstance){
-            this.resolvedInstance = resolvedInstance;
-            this.wrappedInstance = function(){return resolvedInstance;}
-            return;
+        if(this.resolvedInstance){
+            this.handleResolvedInstancePassedIn();
         }
-        if (internal) {
-            var resolvedPath = _path.join(appRoot, this.path);
-            this.wrappedInstance = require(resolvedPath);
+        else if (this.internal) {
+            this.handleInternalDependency();
+
         } else {
-            this.wrappedInstance = function () {
-                return require(this.path);
-            };
+            this.handleExternalModule();
         }
-        this._children;
-        this.resolvedInstance;
+
     }
 
     resolveInstance(graph){
@@ -56,4 +53,18 @@ module.exports = class Dependency{
         return this._children;
     }
 
+    handleResolvedInstancePassedIn() {
+        this.wrappedInstance = function(){return this.resolvedInstance;};
+    }
+
+    handleInternalDependency() {
+        var resolvedPath = _path.join(appRoot, this.path);
+        this.wrappedInstance = require(resolvedPath);
+    }
+
+    handleExternalModule() {
+        this.wrappedInstance = function () {
+            return require(this.path);
+        };
+    }
 };

@@ -13,6 +13,7 @@ var invariant = require('invariant');
 module.exports =  class Container{
     constructor(registryFunc){
         invariant(registryFunc && _.isFunction(registryFunc), 'Container requires a registry function');
+        this.registryFunc = registryFunc;
         this.registry = registryFunc(new RegistryDSL());
 
         this.dependencyGraph = new Graph();
@@ -40,6 +41,7 @@ module.exports =  class Container{
     inject(dependencies) {
         if(!_.isArray(dependencies)){ dependencies = [dependencies];}
         this.dependencyGraph = new Graph();
+        this.registry = this.registryFunc(new RegistryDSL());
         var packageJson =  require(this.registry.pathToPackageJson);
         this.dependencyGraph.buildGraph(packageJson);
         applyRegistry(this.registry, this.dependencyGraph);
@@ -47,10 +49,9 @@ module.exports =  class Container{
         dependencies.forEach(d => {
             invariant(d.name, 'injected dependecy must have a name');
             invariant(d.resolvedInstance || d.path, 'injected dependency must have either a resolvedInstance or a path');
-            console.log(d.resolvedInstance);
             var newDep = d.resolvedInstance
-                ? new Dependency(d.name, '', false, d.resolvedInstance)
-                : new Dependency(d.name, d.path, d.internal);
+                ? new Dependency({name:d.name, resolvedInstance:d.resolvedInstance})
+                : new Dependency({name: d.name, path: d.path, internal : d.internal});
             this.dependencyGraph.addItem(newDep);
         });
         new GraphResolution().recurse(this.dependencyGraph);
