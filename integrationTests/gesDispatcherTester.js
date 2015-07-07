@@ -15,19 +15,8 @@ describe('gesDispatcher', function() {
     var testEventHandler;
     var append;
 
-    before(async function () {
+    before( function () {
         bootstrap = require('../bootstrap');
-        Mut = bootstrap.getInstanceOf('gesDispatcher');
-        TestEventHandler = bootstrap.getInstanceOf('TestEventHandler');
-        testEventHandler = new TestEventHandler();
-        mut = new Mut({handlers:[testEventHandler]});
-        mut.startDispatching();
-        uuid = bootstrap.getInstanceOf('uuid');
-        EventData = bootstrap.getInstanceOf('EventData');
-        append = bootstrap.getInstanceOf('appendToStreamPromise');
-        appendData = { expectedVersion: -2, some:'data' };
-        appendData.events = [new EventData(uuid.v4(), 'testing1', appendData,{eventTypeName:'testingEvent'})];
-        await append('dispatchStream',appendData);
 
     });
 
@@ -36,8 +25,21 @@ describe('gesDispatcher', function() {
 
     context('when calling gesDispatcher', ()=> {
         it('should retrieve events', ()=> {
-            //this.timeout(1500);
-            testEventHandler.eventsHandled.length.must.equal(1);
+            //this.timeout(15000);
+
+            Mut = bootstrap.getInstanceOf('gesDispatcher');
+            TestEventHandler = bootstrap.getInstanceOf('TestEventHandler');
+            uuid = bootstrap.getInstanceOf('uuid');
+            EventData = bootstrap.getInstanceOf('EventData');
+            append = bootstrap.getInstanceOf('appendToStreamPromise');
+
+            testEventHandler = new TestEventHandler();
+            mut = new Mut({handlers:[testEventHandler]});
+            mut.startDispatching();
+            appendData = { expectedVersion: -2, some:'data' };
+            appendData.events = [new EventData(uuid.v4(), 'testing1', appendData,{eventTypeName:'testingEvent'})];
+            append('dispatchStream',appendData);
+            testEventHandler.eventsHandled.length.must.be.at.least(1);
         });
     });
 });

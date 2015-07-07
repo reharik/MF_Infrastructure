@@ -28,6 +28,7 @@ module.exports = function(config,
             );
             this.connection = gesConnection;
         }
+
         getConn(){
             return this.connection;
         }
@@ -55,13 +56,18 @@ module.exports = function(config,
             //this.setMetadata();
 
             var subscription = this.connection.subscribeToAllFrom();
-            var relevantEvents = rx.Observable.fromEvent(subscription, 'event')
-                .filter(this.filterEvents, this)
-                .map(this.createGesEvent, this);
 
-            relevantEvents.subscribe(vent => this.serveEventToHandlers(vent,this.options.handlers),
-                error => { throw error; }
-            );
+            logger.debug('observable created');
+
+
+            var relevantEvents = rx.Observable.fromEvent(subscription, 'event')
+                .forEach(x=> console.log(x));
+            //var relevantEvents = rx.Observable.fromEvent(subscription, 'event').forEach(x=> console.log(x));
+            //    .filter(this.filterEvents, this)
+            //    .map(this.createGesEvent, this);
+            //relevantEvents.forEach(vent => this.serveEventToHandlers(vent,this.options.handlers),
+            //    error => { throw error; }
+            //);
 
         }
 
@@ -78,7 +84,7 @@ module.exports = function(config,
         filterEvents(payload) {
             logger.info('event received by dispatcher');
             logger.trace('filtering event for system events ($)');
-            if (!payload.Event.EventType.startsWith('$')) {
+            if (payload.Event.EventType.startsWith('$')) {
                 return false;
             }
             logger.trace('event passed filter for system events ($)');
@@ -109,11 +115,11 @@ module.exports = function(config,
             handlers
                 .filter(h=> {
                     logger.info('calling event handler :' + h.eventHandlerName);
-                    h.handlesEvents.filter(he=>he == vent.eventName)
+                    return h.handlesEvents.find(he=>he == vent.eventName)
                 })
                 .forEach(m=> {
                     logger.debug('event handler does handle event type: ' + vent.eventName);
-                    m.handle(vent);
+                    m.handleEvent(vent);
                     logger.debug('event handler finished handleing event');
                 });
 

@@ -6,6 +6,7 @@
   "scripts": {
     "start": "gulp dev",
     "test": "mocha --opts unitTests/mocha.opts unitTests",
+    "testSpecific": "mocha --opts unitTests/mocha.opts ",
     "testDebug": "node-debug _mocha --timeout 15000 --opts unitTests/mocha.opts unitTests",
     "intTest": "mocha --opts integrationTests/mocha.opts integrationTests",
     "intTestSpecific": "mocha --opts integrationTests/mocha.opts "

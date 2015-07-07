@@ -13,6 +13,7 @@ module.exports = function(gesEventHandlerBase) {
         }
 
         someEvent(vnt) {
+            console.log('herexxxxxxxxxxxxxxxxxxxxxxxx')
             this.eventsHandled.push(vnt);
         }
 
