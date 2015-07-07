@@ -2,7 +2,15 @@
  * Created by rharik on 6/18/15.
  */
 
-module.exports = function(config, invariant, _, GesEvent, gesclient, gesConnection, logger, JSON) {
+module.exports = function(config,
+                          invariant,
+                          _,
+                          rx,
+                          GesEvent,
+                          gesclient,
+                          gesConnection,
+                          logger,
+                          bufferToJson) {
     return class gesDispatcher {
         constructor(_options) {
             logger.trace('constructing gesDispatcher base version');
@@ -24,6 +32,7 @@ module.exports = function(config, invariant, _, GesEvent, gesclient, gesConnecti
             return this.connection;
         }
 
+        //TODO this will go in the app setup
         setMetadata() {
             var setData = {
                 expectedMetastreamVersion: -1
@@ -44,44 +53,32 @@ module.exports = function(config, invariant, _, GesEvent, gesclient, gesConnecti
         startDispatching() {
             logger.info('startDispatching called');
             //this.setMetadata();
+
             var subscription = this.connection.subscribeToAllFrom();
-            subscription.on('event', function (payload) {
-                logger.info('event received by dispatcher');
-                this.handleEvent(payload);
-                logger.info('event processed by dispatcher');
-            }.bind(this))
+            var relevantEvents = rx.Observable.fromEvent(subscription, 'event')
+                .filter(this.filterEvents, this)
+                .map(this.createGesEvent, this);
+
+            relevantEvents.subscribe(vent => this.serveEventToHandlers(vent,this.options.handlers),
+                error => { throw error; }
+            );
+
         }
 
-        handleEvent(payload) {
-            logger.trace('filtering event before processing');
-            if (!this.filterEvents(payload)) {
-                logger.trace('event filtered out by dispatcher');
-                return;
-            }
+        createGesEvent(payload){
             logger.debug('event passed through filter');
-            var vent = new GesEvent(JSON.parse(payload.OriginalEvent.Metadata.toString('utf8'))[this.options.targetTypeName],
+            var vent = new GesEvent(bufferToJson(payload.OriginalEvent.Metadata)[this.options.targetTypeName],
                 payload.OriginalPosition,
                 payload.OriginalEvent.Metadata,
                 payload.OriginalEvent.Data);
             logger.info('event transfered into gesEvent: '+JSON.stringify(vent));
-
-            logger.info('looping through event handlers');
-            this.options.handlers.forEach(h=> {
-                logger.info('calling event handler :' + h.eventHandlerName);
-                if (!h.handlesEvents.find(x => x === vent.eventName)) {
-                    logger.trace('event handler does not handle event type: ' + vent.eventName);
-                    return;
-                }
-                logger.debug('event handler does handle event type: ' + vent.eventName);
-                h.handleEvent(vent);
-                logger.debug('event handler finished handleing event');
-
-            });
+            return vent;
         }
 
         filterEvents(payload) {
+            logger.info('event received by dispatcher');
             logger.trace('filtering event for system events ($)');
-            if (payload.Event.EventType.startsWith('$')) {
+            if (!payload.Event.EventType.startsWith('$')) {
                 return false;
             }
             logger.trace('event passed filter for system events ($)');
@@ -97,8 +94,8 @@ module.exports = function(config, invariant, _, GesEvent, gesclient, gesConnecti
             logger.trace('event has data');
             logger.trace('filtering event for targetTypeName');
 
-
-            if (_.isEmpty(JSON.parse(payload.OriginalEvent.Metadata.toString('utf8'))[this.options.targetTypeName])) {
+            var metadata = bufferToJson(payload.OriginalEvent.Metadata);
+            if (!metadata || !metadata[this.options.targetTypeName]) {
                 return false;
             }
 
@@ -106,6 +103,21 @@ module.exports = function(config, invariant, _, GesEvent, gesclient, gesConnecti
             return true;
         }
 
+        serveEventToHandlers(vent, handlers) {
+            logger.info('looping through event handlers');
 
+            handlers
+                .filter(h=> {
+                    logger.info('calling event handler :' + h.eventHandlerName);
+                    h.handlesEvents.filter(he=>he == vent.eventName)
+                })
+                .forEach(m=> {
+                    logger.debug('event handler does handle event type: ' + vent.eventName);
+                    m.handle(vent);
+                    logger.debug('event handler finished handleing event');
+                });
+
+            logger.info('event processed by dispatcher');
+        }
     }
 };
