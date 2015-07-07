@@ -3,26 +3,38 @@
  */
 
 require('must');
-//
-//describe('gesConnection', function() {
-//    var gesConnection;
-//    var bootstrap;
-//    var mut;
-//
-//    before(function(){
-//        bootstrap = require('../bootstrap');
-//        mut = bootstrap.getInstanceOf('gesConnection');
-//    });
-//
-//    beforeEach(function(){
-//    });
-//
-//    context('passing proper args', ()=> {
-//        it('should should return a connection', function () {
-//            console.log(mut);
-//            mut.must.not.be.null();
-//            mut._handler._connectingPhase.must.equal('Connected');
-//        })
-//    });
-//});
+
+describe('gesConnection', function() {
+    var gesConnection;
+    var bootstrap;
+    var mut;
+
+    before(function(){
+        bootstrap = require('../bootstrap');
+    });
+
+    beforeEach(function(){
+    });
+
+    context('passing proper args', ()=> {
+        it('should should return a connection', function () {
+            mut = bootstrap.getInstanceOf('gesConnection');
+            console.log(mut);
+            mut.must.not.be.null();
+            mut._handler._connectingPhase.must.equal('Connected');
+        })
+    });
+
+    context('when calling subscription', ()=> {
+        it('should stay open', function () {
+            mut = bootstrap.getInstanceOf('gesConnection');
+            var subscription = mut.subscribeToAllFrom();
+            subscription.on('event', function (payload) {
+                console.log('event received by dispatcher');
+                console.log('event processed by dispatcher');
+            });
+            mut._handler._connectingPhase.must.equal('Connected');
+        })
+    });
+});
 

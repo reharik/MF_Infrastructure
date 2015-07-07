@@ -7,7 +7,8 @@
     "start": "gulp dev",
     "test": "mocha --opts unitTests/mocha.opts unitTests",
     "testDebug": "node-debug _mocha --timeout 15000 --opts unitTests/mocha.opts unitTests",
-    "intTest": "mocha --opts integrationTests/mocha.opts integrationTests"
+    "intTest": "mocha --opts integrationTests/mocha.opts integrationTests",
+    "intTestSpecific": "mocha --opts integrationTests/mocha.opts "
   },
   "license": "MIT",
   "node": ">=0.12.0",

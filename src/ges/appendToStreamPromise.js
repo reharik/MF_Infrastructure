@@ -19,7 +19,6 @@ module.exports = function appendToStreamPromise(Promise, invariant, logger, gesC
         );
         logger.trace('wrapping appendToStream in Promise');
         return new Promise(function (resolve, reject) {
-            //console.log(global.container.gesConnection);
 
             gesConnection.appendToStream(streamName, data, function (err, result) {
                 logger.trace('appendToStream callback');

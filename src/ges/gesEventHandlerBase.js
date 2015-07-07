@@ -30,7 +30,7 @@ module.exports = function(NotificationEvent, appendToStreamPromise, expectIdempo
                 logger.trace('event Handled by: ' + gesEvent.eventName + ' on ' + this.eventHandlerName);
 
             } catch (exception) {
-                logger.error('event: ' + gesEvent + ' threw exception: ' + exception);
+                logger.error('event: ' + JSON.stringify(gesEvent) + ' threw exception: ' + exception);
                 this.responseMessage = new NotificationEvent("Failure", exception.message, gesEvent);
             } finally {
                 if (this.responseMessage) {
@@ -40,13 +40,13 @@ module.exports = function(NotificationEvent, appendToStreamPromise, expectIdempo
                         this.responseMessage.data,
                         {"continuationId": this.continuationId});
 
-                    logger.debug('response event created: ' + responseEvent);
+                    logger.debug('response event created: ' + JSON.stringify(responseEvent));
 
                     var appendData = {
                         expectedVersion: -2,
                         events: [responseEvent]
                     };
-                    logger.debug('event data created: ' + appendData);
+                    logger.debug('event data created: ' + JSON.stringify(appendData));
 
                     logger.trace('publishing notification');
                     this.result = appendToStreamPromise('notification', appendData);

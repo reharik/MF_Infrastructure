@@ -43,7 +43,7 @@ module.exports = function(config, invariant, _, GesEvent, gesclient, gesConnecti
 
         startDispatching() {
             logger.info('startDispatching called');
-            this.setMetadata();
+            //this.setMetadata();
             var subscription = this.connection.subscribeToAllFrom();
             subscription.on('event', function (payload) {
                 logger.info('event received by dispatcher');
@@ -53,14 +53,13 @@ module.exports = function(config, invariant, _, GesEvent, gesclient, gesConnecti
         }
 
         handleEvent(payload) {
-            console.log(payload.OriginalEvent.Metadata[this.options.targetTypeName]);
-            logger.debug('filtering event before processing');
+            logger.trace('filtering event before processing');
             if (!this.filterEvents(payload)) {
                 logger.trace('event filtered out by dispatcher');
                 return;
             }
             logger.debug('event passed through filter');
-            var vent = new GesEvent(payload.OriginalEvent.Metadata[this.options.targetTypeName],
+            var vent = new GesEvent(JSON.parse(payload.OriginalEvent.Metadata.toString('utf8'))[this.options.targetTypeName],
                 payload.OriginalPosition,
                 payload.OriginalEvent.Metadata,
                 payload.OriginalEvent.Data);
@@ -97,9 +96,12 @@ module.exports = function(config, invariant, _, GesEvent, gesclient, gesConnecti
             }
             logger.trace('event has data');
             logger.trace('filtering event for targetTypeName');
-            if (_.isEmpty(payload.OriginalEvent.Metadata[this.options.targetTypeName])) {
+
+
+            if (_.isEmpty(JSON.parse(payload.OriginalEvent.Metadata.toString('utf8'))[this.options.targetTypeName])) {
                 return false;
             }
+
             logger.trace('event has proper targetTypeName');
             return true;
         }
