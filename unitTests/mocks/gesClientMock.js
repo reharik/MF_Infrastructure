@@ -27,6 +27,12 @@ module.exports = function(uuid) {
             return subscription;
         };
 
+        var subscribeToStreamFrom = function () {
+            console.log('mock stream subscription');
+            subscription = new Subscription();
+            return subscription;
+        };
+
         var subscribeToAllFrom = function () {
             console.log('mock stream subscription');
             subscription = new Subscription();
@@ -75,7 +81,8 @@ module.exports = function(uuid) {
             getId:getId,
             getSubscription:getSubscription,
             subscribeToStream: subscribeToStream,
-            subscribeToAllFrom: subscribeToAllFrom,
+            subscribeToStreamFrom: subscribeToStreamFrom,
+            subscribeToAllFrom:subscribeToAllFrom,
             appendToStream: appendToStream,
             readStreamEventsForward: readStreamEventsForward,
             readStreamEventForwardShouldReturnResult: readStreamEventForwardShouldReturnResult,

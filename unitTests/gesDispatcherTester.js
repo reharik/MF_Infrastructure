@@ -81,10 +81,10 @@ describe('gesDispatcher', function() {
                 var subscription = gesConnection.getSubscription();
                 console.log(subscription);
                 var eventData = {
-                    Event:{EventType:'someEvent'},
+                    Event:{EventType:'someEventNotificationOn'},
                     OriginalPosition:{},
                     OriginalEvent:{
-                        Metadata:{eventTypeName:'someEvent'},
+                        Metadata:{eventTypeName:'someEventNotificationOn'},
                         Data:{'some':'data'}
                     }
 
@@ -100,7 +100,7 @@ describe('gesDispatcher', function() {
                     Event:{EventType:'testEvent'},
                     OriginalPosition:'the originalPosition',
                     OriginalEvent:{
-                        Metadata:{eventTypeName:'someEvent'},
+                        Metadata:{eventTypeName:'someEventNotificationOn'},
                         Data:{'some':'data'}
                     }
 
@@ -116,7 +116,7 @@ describe('gesDispatcher', function() {
                     Event:{EventType:'testEvent'},
                     OriginalPosition:'the originalPosition',
                     OriginalEvent:{
-                        Metadata:{eventTypeName:'someEvent'},
+                        Metadata:{eventTypeName:'someEventNotificationOn'},
                         Data:{'some':'data'}
                     }
 
@@ -124,9 +124,9 @@ describe('gesDispatcher', function() {
                 subscription.emit('event', eventData);
                 var eventsHandled = testHandler.eventsHandled[0];
                 console.log(eventsHandled);
-                eventsHandled.eventName.must.equal('someEvent');
+                eventsHandled.eventName.must.equal('someEventNotificationOn');
                 eventsHandled.originalPosition.must.equal('the originalPosition');
-                eventsHandled.metadata.eventTypeName.must.equal('someEvent');
+                eventsHandled.metadata.eventTypeName.must.equal('someEventNotificationOn');
                 eventsHandled.data.some.must.equal('data');
             })
         });
@@ -139,7 +139,7 @@ describe('gesDispatcher', function() {
                     Event:{EventType:'$testEvent'},
                     OriginalPosition:{},
                     OriginalEvent:{
-                        Metadata:{eventTypeName:'someEvent'},
+                        Metadata:{eventTypeName:'someEventNotificationOn'},
                         Data:{'some':'data'}
                     }
 
@@ -169,7 +169,7 @@ describe('gesDispatcher', function() {
                     Event:{EventType:'testEvent'},
                     OriginalPosition:{},
                     OriginalEvent:{
-                        Metadata:{eventTypeName:'someEvent'},
+                        Metadata:{eventTypeName:'someEventNotificationOn'},
                         Data:{}
                     }
 

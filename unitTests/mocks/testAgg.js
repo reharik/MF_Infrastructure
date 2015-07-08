@@ -24,22 +24,22 @@ module.exports = function (AggregateRootBase, GesEvent) {
         commandHandlers() {
             return {
                 'someCommand': function (command) {
-                    var vent1 = new GesEvent('someshite', null, null, {blah: command.value});
+                    var vent1 = new GesEvent('someAggEvent', null, {someMetadata:'1234'}, {blah: command.value});
                     this.raiseEvent(vent1);
                 },
                 'someOtherCommand': function (command) {
+                    var vent2 = new GesEvent('someOtherAggEvent', null,  {someOtherMetadata:'1234'}, {blah: command.value});
                     this.raiseEvent(vent2);
-                    var vent2 = new GesEvent('someOthershite', null, null, {blah: command.value});
                 }
             }
         }
 
         applyEventHandlers() {
             return {
-                'someEvent': function (event) {
+                'someAggEvent': function (event) {
                     this.eventsHandled.push(event);
                 }.bind(this),
-                'someOtherEvent': function (event) {
+                'someOtherAggEvent': function (event) {
                     this.eventsHandled.push(event);
                 }.bind(this)
             }

@@ -7,21 +7,39 @@ module.exports = function(gesEventHandlerBase) {
     return class TestEventHandler extends gesEventHandlerBase {
         constructor() {
             super();
-            this.handlesEvents = ['someEvent', 'testingEvent'];
+            this.handlesEvents = ['someEventNotificationOn',
+                'someEventNotificationOff',
+                'someExceptionNotificationOn',
+                'someExceptionNotificationOff',
+                'testingEventNotificationOn',
+                'testingEventNotificationOff'];
             this.eventsHandled = [];
             this.eventHandlerName = 'TestEventHandler';
         }
 
-        someEvent(vnt) {
-            console.log('herexxxxxxxxxxxxxxxxxxxxxxxx')
+        someEventNotificationOn(vnt) {
+            this.createNotification(vnt);
             this.eventsHandled.push(vnt);
         }
 
-        someException(vnt) {
+        someEventNotificationOff(vnt) {
+            this.eventsHandled.push(vnt);
+        }
+
+        someExceptionNotificationOn(vnt) {
+            this.createNotification(vnt);
+            throw(new Error());
+        }
+        someExceptionNotificationOff(vnt) {
             throw(new Error());
         }
 
-        testingEvent(vnt){
+        testingEventNotificationOn(vnt){
+            this.createNotification(vnt);
+            this.eventsHandled.push(vnt);
+        }
+
+        testingEventNotificationOff(vnt){
             this.eventsHandled.push(vnt);
         }
 

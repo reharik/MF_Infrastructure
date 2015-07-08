@@ -1,7 +1,7 @@
 /**
  * Created by rharik on 7/6/15.
  */
-require('must');
+var demand = require('must');
 
 
 describe('gesDispatcher', function() {
@@ -21,25 +21,31 @@ describe('gesDispatcher', function() {
     });
 
     beforeEach(function () {
+        Mut = bootstrap.getInstanceOf('gesDispatcher');
+        TestEventHandler = bootstrap.getInstanceOf('TestEventHandler');
+        uuid = bootstrap.getInstanceOf('uuid');
+        EventData = bootstrap.getInstanceOf('EventData');
+        append = bootstrap.getInstanceOf('appendToStreamPromise');
+
+        testEventHandler = new TestEventHandler();
+        mut = new Mut({handlers:[testEventHandler]});
+        mut.startDispatching();
+        appendData = { expectedVersion: -2, some:'data' };
+        appendData.events = [new EventData(uuid.v4(), 'testing1', appendData,{eventTypeName:'testingEventNotificationOn'})];
+        append('dispatchStream',appendData);
     });
 
     context('when calling gesDispatcher', ()=> {
-        it('should retrieve events', ()=> {
-            //this.timeout(15000);
+        it('should retrieve events', (done)=> {
+            setTimeout(()=>{
+                testEventHandler.eventsHandled.length.must.be.at.least(1);
+                demand(testEventHandler.eventsHandled.find(x=>x.eventName != 'testingEventNotificationOn')).be.undefined();
 
-            Mut = bootstrap.getInstanceOf('gesDispatcher');
-            TestEventHandler = bootstrap.getInstanceOf('TestEventHandler');
-            uuid = bootstrap.getInstanceOf('uuid');
-            EventData = bootstrap.getInstanceOf('EventData');
-            append = bootstrap.getInstanceOf('appendToStreamPromise');
 
-            testEventHandler = new TestEventHandler();
-            mut = new Mut({handlers:[testEventHandler]});
-            mut.startDispatching();
-            appendData = { expectedVersion: -2, some:'data' };
-            appendData.events = [new EventData(uuid.v4(), 'testing1', appendData,{eventTypeName:'testingEvent'})];
-            append('dispatchStream',appendData);
-            testEventHandler.eventsHandled.length.must.be.at.least(1);
+
+                done();
+            }, 1000);
+
         });
     });
 });

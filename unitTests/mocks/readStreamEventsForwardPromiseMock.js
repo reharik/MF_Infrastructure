@@ -3,11 +3,11 @@
  */
 
 module.exports = function(bluebird,GesEvent) {
-    var data = JSON.stringify(new GesEvent('someEvent',null,null,{blah:'blah'}));
+    var data = JSON.stringify(new GesEvent('someEventNotificationOn',null,null,{blah:'blah'}));
     var _result = {
         Status: 'OK',
         NextEventNumber:3,
-        Events: [{Event:{EventName:'someEvent',Data: data}},{Event:{EventName:'someEvent',Data: data}},{Event:{EventName:'someEvent',Data: data}}],
+        Events: [{Event:{EventName:'someEventNotificationOn',Data: data}},{Event:{EventName:'someEventNotificationOn',Data: data}},{Event:{EventName:'someEventNotificationOn',Data: data}}],
         IsEndOfStream: false
     };
     return {

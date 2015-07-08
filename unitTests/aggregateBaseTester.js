@@ -50,7 +50,7 @@ describe('aggregateFunctionality', function() {
     describe('#CommandHandlers', function(){
         context('when calling a commandHandler', function () {
             it('should emit an event to the uncommited event collection and getuncommitedevents should work', function () {
-                mut.someCommand({'commandName':'someEvent', 'value':'some value'});
+                mut.someCommand({'commandName':'someEventNotificationOff', 'value':'some value'});
                 mut.getUncommittedEvents()[0].data.blah.must.equal('some value');
             })
         });
@@ -59,7 +59,7 @@ describe('aggregateFunctionality', function() {
     describe('#CommandHandlers', function(){
         context('when calling a clearUncommitedEvents', function () {
             it('should clear events', function () {
-                mut.someCommand({'commandName':'someEvent', 'value':'some value'});
+                mut.someCommand({'commandName':'someEventNotificationOff', 'value':'some value'});
                 mut.clearUncommittedEvents();
                 mut.getUncommittedEvents().must.be.empty;
             })

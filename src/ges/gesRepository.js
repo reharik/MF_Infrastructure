@@ -14,7 +14,8 @@ module.exports = function(invariant,
                           appendToStreamPromise,
                           readStreamEventsForwardPromise,
                           streamNameStrategy,
-                          logger) {
+                          logger,
+                          uuid) {
 
     return function (_options) {
         logger.trace('constructing gesRepository');
@@ -135,10 +136,11 @@ module.exports = function(invariant,
                     "aggregateType must inherit from AggregateBase"
                 );
 
+                if(!aggregate._id){ aggregate._id = uuid.v1(); }
                 // standard data for metadata portion of persisted event
                 metadata = {
                     // handy tracking id
-                    commitIdHeader: commitId,
+                    commitIdHeader: commitId || uuid.v1(),
                     // type of aggregate being persisted
                     aggregateTypeHeader: aggregate.constructor.name
                 };
@@ -159,14 +161,15 @@ module.exports = function(invariant,
                 logger.trace('calculating expected version :' + expectedVersion);
 
                 logger.debug('creating EventData for each event');
-                events = newEvents.map(x=> new EventData(x.id, x.type, x, metadata));
+                events = newEvents.map(x=> new EventData(uuid.v1(), x.type, x, metadata));
                 logger.trace('EventData created for each event');
 
                 appendData = {
                     expectedVersion: expectedVersion,
                     events: events
                 };
-                logger.debug('event data for posting created: ' + appendData);
+                logger.debug('event data for posting created: ' + JSON.stringify(appendData));
+                logger.debug(appendData);
 
                 logger.trace('about to append events to stream');
                 result = await appendToStreamPromise(streamName, appendData);

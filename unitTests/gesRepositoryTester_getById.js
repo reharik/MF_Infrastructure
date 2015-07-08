@@ -45,11 +45,11 @@ describe('getEventStoreRepository', function() {
         });
         context('when calling getById with proper args',function (){
             it('should return proper agg', async function () {
-                var data = JSON.stringify(new GesEvent('someEvent',null,null,{blah:'blah'}));
+                var data = JSON.stringify(new GesEvent('someAggEvent',null,null,{blah:'blah'}));
                 var result = {
                     Status: 'OK',
                     NextEventNumber:3,
-                    Events: [{Event:{EventName:'someEvent',Data: data}},{Event:{EventName:'someEvent',Data: data}},{Event:{EventName:'someEvent',Data: data}}],
+                    Events: [{Event:{EventName:'someAggEvent',Data: data}},{Event:{EventName:'someAggEvent',Data: data}},{Event:{EventName:'someAggEvent',Data: data}}],
                     IsEndOfStream: false
                 };
                 gesConnection.readStreamEventForwardShouldReturnResult(result);
@@ -73,11 +73,11 @@ describe('getEventStoreRepository', function() {
 
         context('when calling getById with proper args but stream deleted', function (){
             it('should throw proper error', function () {
-                var data = JSON.stringify(new GesEvent('someEvent',null,null,{blah:'blah'}));
+                var data = JSON.stringify(new GesEvent('someEventNotificationOn',null,null,{blah:'blah'}));
                 var result = {
                     Status: 'StreamDeleted',
                     NextEventNumber:3,
-                    Events: [{Event:{EventName:'someEvent',Data: data}},{Event:{EventName:'someEvent',Data: data}},{Event:{EventName:'someEvent',Data: data}}],
+                    Events: [{Event:{EventName:'someEventNotificationOn',Data: data}},{Event:{EventName:'someEventNotificationOn',Data: data}},{Event:{EventName:'someEventNotificationOn',Data: data}}],
                     IsEndOfStream: false
                 };
                 var id = uuid.v1();
@@ -89,11 +89,11 @@ describe('getEventStoreRepository', function() {
         });
         context('when calling getById with proper args but stream not found', function (){
             it('should throw proper error', function () {
-                var data = JSON.stringify(new GesEvent('someEvent',null,null,{blah:'blah'}));
+                var data = JSON.stringify(new GesEvent('someEventNotificationOn',null,null,{blah:'blah'}));
                     var result = {
                     Status: 'StreamNotFound',
                     NextEventNumber:3,
-                    Events: [{Event:{EventName:'someEvent',Data: data}},{Event:{EventName:'someEvent',Data: data}},{Event:{EventName:'someEvent',Data: data}}],
+                    Events: [{Event:{EventName:'someEventNotificationOn',Data: data}},{Event:{EventName:'someEventNotificationOn',Data: data}},{Event:{EventName:'someEventNotificationOn',Data: data}}],
                     IsEndOfStream: false
                 };
                 var id = uuid.v1();

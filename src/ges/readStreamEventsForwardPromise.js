@@ -18,7 +18,7 @@ module.exports = function(Promise, invariant, gesConnection, logger) {
             gesConnection.readStreamEventsForward(streamName, skipTake, function (err, results) {
                 logger.trace('readStreamEventsForward callback');
                 if (err) {
-                    logger.debug('rejecting readStreamEventsForward Promise with error message: ' + err);
+                    logger.error('rejecting readStreamEventsForward Promise with error message: ' + err);
                     reject(err);
                 } else {
                     logger.debug('resolving readStreamEventsForward Promise with response: ' + results);

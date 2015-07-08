@@ -8,7 +8,7 @@ module.exports = function (AggregateRootBase) {
         }
         applyEventHandlers() {
             return {
-                'someEvent': function (event) {
+                'someEventNotificationOn': function (event) {
                     this.eventsHandled.push(event);
                 }.bind(this),
                 'someOtherEvent': function (event) {

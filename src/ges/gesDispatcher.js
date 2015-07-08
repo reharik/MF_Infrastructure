@@ -54,40 +54,28 @@ module.exports = function(config,
         startDispatching() {
             logger.info('startDispatching called');
             //this.setMetadata();
-
             var subscription = this.connection.subscribeToAllFrom();
+            //var subscription = this.connection.subscribeToStreamFrom(this.options.stream);
+
+            //Dispatcher gets raw events from ges in the EventData Form
 
             logger.debug('observable created');
-
-
             var relevantEvents = rx.Observable.fromEvent(subscription, 'event')
-                .forEach(x=> console.log(x));
-            //var relevantEvents = rx.Observable.fromEvent(subscription, 'event').forEach(x=> console.log(x));
-            //    .filter(this.filterEvents, this)
-            //    .map(this.createGesEvent, this);
-            //relevantEvents.forEach(vent => this.serveEventToHandlers(vent,this.options.handlers),
-            //    error => { throw error; }
-            //);
+                .filter(this.filterEvents, this)
+                .map(this.createGesEvent, this);
+            relevantEvents.forEach(vent => this.serveEventToHandlers(vent,this.options.handlers),
+                error => { throw error; }
+            );
 
-        }
-
-        createGesEvent(payload){
-            logger.debug('event passed through filter');
-            var vent = new GesEvent(bufferToJson(payload.OriginalEvent.Metadata)[this.options.targetTypeName],
-                payload.OriginalPosition,
-                payload.OriginalEvent.Metadata,
-                payload.OriginalEvent.Data);
-            logger.info('event transfered into gesEvent: '+JSON.stringify(vent));
-            return vent;
         }
 
         filterEvents(payload) {
-            logger.info('event received by dispatcher');
-            logger.trace('filtering event for system events ($)');
+            //logger.info('event received by dispatcher');
+            //logger.trace('filtering event for system events ($)');
             if (payload.Event.EventType.startsWith('$')) {
                 return false;
             }
-            logger.trace('event passed filter for system events ($)');
+            //logger.trace('event passed filter for system events ($)');
             logger.trace('filtering event for empty metadata');
             if (_.isEmpty(payload.OriginalEvent.Metadata)) {
                 return false;
@@ -107,6 +95,17 @@ module.exports = function(config,
 
             logger.trace('event has proper targetTypeName');
             return true;
+        }
+
+        createGesEvent(payload) {
+            logger.debug('event passed through filter');
+            var vent = new GesEvent();
+            vent.eventType = bufferToJson(payload.OriginalEvent.Metadata)[this.options.targetTypeName];
+            vent.originalPosition = payload.OriginalPosition;
+            vent.setMetaData(payload.OriginalEvent.Metadata);
+            vent.setData(payload.OriginalEvent.Data);
+            logger.info('event transfered into gesEvent: ' + JSON.stringify(vent));
+            return vent;
         }
 
         serveEventToHandlers(vent, handlers) {
