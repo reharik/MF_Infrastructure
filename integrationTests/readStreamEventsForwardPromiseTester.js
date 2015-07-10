@@ -16,7 +16,7 @@ describe('readStreamEventsForwardPromiseTester', function() {
         var EventData = bootstrap.getInstanceOf('EventData');
         var append = bootstrap.getInstanceOf('appendToStreamPromise');
         var appendData = { expectedVersion: -2 };
-        appendData.events = [new EventData(uuid.v4(), 'testing1', appendData)];
+        appendData.events = [new EventData('testing1', appendData)];
         append('readStream',appendData);
     });
 
@@ -47,6 +47,7 @@ describe('readStreamEventsForwardPromiseTester', function() {
             var results = await mut('readStream', {start: 0, count: 10});
             results.Status.must.equal('Success');
             results.Events.length.must.be.at.most(10);
+            console.log(results.Events);
         });
     });
 });

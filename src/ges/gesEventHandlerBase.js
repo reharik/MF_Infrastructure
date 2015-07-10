@@ -20,11 +20,11 @@ module.exports = function(NotificationEvent, appendToStreamPromise, expectIdempo
             logger.trace('event idempotent');
 
             try {
-                logger.info('calling specific event handler for: ' + gesEvent.eventName + ' on ' + this.eventHandlerName);
+                logger.info('calling specific event handler for: ' + gesEvent.eventTypeName + ' on ' + this.eventHandlerName);
 
-                this[gesEvent.eventName](gesEvent);
+                this[gesEvent.eventTypeName](gesEvent);
                 
-                logger.trace('event Handled by: ' + gesEvent.eventName + ' on ' + this.eventHandlerName);
+                logger.trace('event Handled by: ' + gesEvent.eventTypeName + ' on ' + this.eventHandlerName);
 
             } catch (exception) {
                 logger.error('event: ' + JSON.stringify(gesEvent) + ' threw exception: ' + exception);
@@ -35,11 +35,11 @@ module.exports = function(NotificationEvent, appendToStreamPromise, expectIdempo
                 if (this.responseMessage) {
                     logger.trace('beginning to process responseMessage');
 
-                    var responseEvent = new EventData(this.responseMessage.id,
-                        this.responseMessage.data.eventName,
-                        this.responseMessage.data,
+                    var responseEvent = new EventData(
+                        this.responseMessage.eventTypeName,
                         {"continuationId": this.continuationId,
-                        "eventTypeName":"notificationEvent"});
+                        "eventTypeName":"notificationEvent"},
+                        this.responseMessage.data);
 
                     logger.debug('response event created: ' + JSON.stringify(responseEvent));
 

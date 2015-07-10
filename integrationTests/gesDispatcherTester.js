@@ -31,7 +31,7 @@ describe('gesDispatcher', function() {
         mut = new Mut({handlers:[testEventHandler]});
         mut.startDispatching();
         appendData = { expectedVersion: -2, some:'data' };
-        appendData.events = [new EventData(uuid.v4(), 'testing1', appendData,{eventTypeName:'testingEventNotificationOn'})];
+        appendData.events = [new EventData('testing1',{eventTypeName:'testingEventNotificationOn'}, appendData)];
         append('dispatchStream',appendData);
     });
 
@@ -39,7 +39,7 @@ describe('gesDispatcher', function() {
         it('should retrieve events', (done)=> {
             setTimeout(()=>{
                 testEventHandler.eventsHandled.length.must.be.at.least(1);
-                demand(testEventHandler.eventsHandled.find(x=>x.eventName != 'testingEventNotificationOn')).be.undefined();
+                demand(testEventHandler.eventsHandled.find(x=>x.eventTypeName != 'testingEventNotificationOn')).be.undefined();
 
 
 

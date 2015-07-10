@@ -18,6 +18,7 @@ module.exports = function(gesEventHandlerBase) {
         }
 
         someEventNotificationOn(vnt) {
+           console.log('here');
             this.createNotification(vnt);
             this.eventsHandled.push(vnt);
         }

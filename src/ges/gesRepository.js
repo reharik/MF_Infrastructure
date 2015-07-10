@@ -22,7 +22,7 @@ module.exports = function(invariant,
         logger.debug('gesRepository options passed in ' + _options);
 
         var options = {
-            eventTypeHeader: 'eventTypeName',
+            eventTypeNameHeader: 'eventTypeName',
             aggregateTypeHeader: 'aggregateTypeName',
             commitIdHeader: 'commitId',
             writePageSize: 2,
@@ -32,8 +32,8 @@ module.exports = function(invariant,
         logger.debug('gesRepository options after merge ' + options);
 
         invariant(
-            options.eventTypeHeader,
-            "repository requires an eventTypeHeader name"
+            options.eventTypeNameHeader,
+            "repository requires an eventTypeNameHeader name"
         );
         invariant(
             options.aggregateTypeHeader,
@@ -86,6 +86,7 @@ module.exports = function(invariant,
 
                     sliceCount = sliceStart + options.readPageSize <= options.readPageSize ? options.readPageSize : version - sliceStart + 1;
                     logger.trace('number of events to pull this iteration: ' + sliceCount);
+                    logger.trace('number of events to pull this iteration: ' + sliceStart);
                     // get all events, or first batch of events from GES
 
                     logger.info('about to pull events for ' + aggregateType + ' from stream ' + streamName);
@@ -107,7 +108,7 @@ module.exports = function(invariant,
                     logger.trace('new sliceStart calculated: ' + sliceStart);
 
                     logger.debug('about to loop through and apply events to aggreagate');
-                    currentSlice.Events.forEach(e=> aggregate.applyEvent(JSON.parse(e.Event.Data)));
+                    currentSlice.Events.forEach(e=>aggregate.applyEvent(JSON.parse(e.Event.Data)));
                     logger.info('events applied to aggregate');
                 } while (version >= currentSlice.NextEventNumber && !currentSlice.IsEndOfStream);
             } catch (error) {
@@ -120,7 +121,7 @@ module.exports = function(invariant,
         }
 
 
-        async function save(aggregate, commitId, _metadata) {
+        function save(aggregate, commitId, _metadata) {
             logger.debug('gesRepo calling save with params:' + aggregate + ', ' + commitId + ', ' + _metadata);
             var streamName;
             var newEvents;
@@ -161,7 +162,7 @@ module.exports = function(invariant,
                 logger.trace('calculating expected version :' + expectedVersion);
 
                 logger.debug('creating EventData for each event');
-                events = newEvents.map(x=> new EventData(uuid.v1(), x.type, x, metadata));
+                events = newEvents.map(x=> new EventData(x.eventTypeName, metadata, x.data));
                 logger.trace('EventData created for each event');
 
                 appendData = {
@@ -172,7 +173,7 @@ module.exports = function(invariant,
                 logger.debug(appendData);
 
                 logger.trace('about to append events to stream');
-                result = await appendToStreamPromise(streamName, appendData);
+                result = appendToStreamPromise(streamName, appendData);
                 logger.debug('events posted to stream:' + streamName);
 
                 logger.trace('clear uncommitted events form aggregate');

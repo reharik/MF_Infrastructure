@@ -49,7 +49,7 @@ describe('getEventStoreRepository', function() {
                 var result = {
                     Status: 'OK',
                     NextEventNumber:3,
-                    Events: [{Event:{EventName:'someAggEvent',Data: data}},{Event:{EventName:'someAggEvent',Data: data}},{Event:{EventName:'someAggEvent',Data: data}}],
+                    Events: [{Event:{Type:'someAggEvent',Data: data}},{Event:{Type:'someAggEvent',Data: data}},{Event:{Type:'someAggEvent',Data: data}}],
                     IsEndOfStream: false
                 };
                 gesConnection.readStreamEventForwardShouldReturnResult(result);
@@ -77,7 +77,7 @@ describe('getEventStoreRepository', function() {
                 var result = {
                     Status: 'StreamDeleted',
                     NextEventNumber:3,
-                    Events: [{Event:{EventName:'someEventNotificationOn',Data: data}},{Event:{EventName:'someEventNotificationOn',Data: data}},{Event:{EventName:'someEventNotificationOn',Data: data}}],
+                    Events: [{Event:{Type:'someEventNotificationOn',Data: data}},{Event:{Type:'someEventNotificationOn',Data: data}},{Event:{Type:'someEventNotificationOn',Data: data}}],
                     IsEndOfStream: false
                 };
                 var id = uuid.v1();
@@ -93,7 +93,7 @@ describe('getEventStoreRepository', function() {
                     var result = {
                     Status: 'StreamNotFound',
                     NextEventNumber:3,
-                    Events: [{Event:{EventName:'someEventNotificationOn',Data: data}},{Event:{EventName:'someEventNotificationOn',Data: data}},{Event:{EventName:'someEventNotificationOn',Data: data}}],
+                    Events: [{Event:{Type:'someEventNotificationOn',Data: data}},{Event:{Type:'someEventNotificationOn',Data: data}},{Event:{Type:'someEventNotificationOn',Data: data}}],
                     IsEndOfStream: false
                 };
                 var id = uuid.v1();

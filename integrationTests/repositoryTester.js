@@ -32,10 +32,12 @@ describe('repositoryTester', function() {
             testAgg = new TestAgg();
             testAgg.someCommand({value:'something Really important!'});
             testAgg.someCommand({value:'not wait. I mean something REALLY important!'});
-            mut.save(testAgg,null,{metametadata:'data'});
-            var agg = await mut.getById(TestAgg,testAgg._id,1);
-            console.log(agg);
-            agg._version.must.equal(1);
+            await mut.save(testAgg,null,{metametadata:'data'});
+            //setInterval(async function(){
+                var agg = await mut.getById(TestAgg,testAgg._id,1);
+                console.log(agg);
+                agg._version.must.equal(2);
+        //},1000, this)
         });
     });
 });

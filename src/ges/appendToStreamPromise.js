@@ -18,8 +18,6 @@ module.exports = function appendToStreamPromise(Promise, invariant, logger, gesC
             'must pass data with at least one event'
         );
         logger.trace('wrapping appendToStream in Promise');
-        console.log('dataxxxxxxxxxxxxxxxxxxxxx');
-        console.log(data);
         return new Promise(function (resolve, reject) {
 
             gesConnection.appendToStream(streamName, data, function (err, result) {

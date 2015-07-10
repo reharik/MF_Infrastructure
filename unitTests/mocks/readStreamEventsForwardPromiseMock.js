@@ -7,7 +7,7 @@ module.exports = function(bluebird,GesEvent) {
     var _result = {
         Status: 'OK',
         NextEventNumber:3,
-        Events: [{Event:{EventName:'someEventNotificationOn',Data: data}},{Event:{EventName:'someEventNotificationOn',Data: data}},{Event:{EventName:'someEventNotificationOn',Data: data}}],
+        Events: [{Event:{Type:'someEventNotificationOn',Data: data}},{Event:{Type:'someEventNotificationOn',Data: data}},{Event:{Type:'someEventNotificationOn',Data: data}}],
         IsEndOfStream: false
     };
     return {

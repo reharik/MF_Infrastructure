@@ -18,7 +18,7 @@ module.exports = function(config,
 
             this.options = {
                 stream: '$all',
-                targetTypeName: 'eventTypeName'
+                targetType: 'eventTypeName'
             };
             _.assign(this.options, _options);
             logger.debug('gesDispatcher base options after merge ' + this.options);
@@ -72,7 +72,7 @@ module.exports = function(config,
         filterEvents(payload) {
             //logger.info('event received by dispatcher');
             //logger.trace('filtering event for system events ($)');
-            if (payload.Event.EventType.startsWith('$')) {
+            if (payload.Event.Type.startsWith('$')) {
                 return false;
             }
             //logger.trace('event passed filter for system events ($)');
@@ -86,24 +86,24 @@ module.exports = function(config,
                 return false;
             }
             logger.trace('event has data');
-            logger.trace('filtering event for targetTypeName');
+            logger.trace('filtering event for targetType');
 
             var metadata = bufferToJson(payload.OriginalEvent.Metadata);
-            if (!metadata || !metadata[this.options.targetTypeName]) {
+            if (!metadata || !metadata[this.options.targetType]) {
                 return false;
             }
 
-            logger.trace('event has proper targetTypeName');
+            logger.trace('event has proper targetType');
             return true;
         }
 
         createGesEvent(payload) {
             logger.debug('event passed through filter');
-            var vent = new GesEvent();
-            vent.eventType = bufferToJson(payload.OriginalEvent.Metadata)[this.options.targetTypeName];
-            vent.originalPosition = payload.OriginalPosition;
-            vent.setMetaData(payload.OriginalEvent.Metadata);
-            vent.setData(payload.OriginalEvent.Data);
+            var vent =  new GesEvent(bufferToJson(payload.OriginalEvent.Metadata)[this.options.targetType],
+                payload.OriginalEvent.Metadata,
+                payload.OriginalEvent.Data,
+                payload.OriginalPosition
+            );
             logger.info('event transfered into gesEvent: ' + JSON.stringify(vent));
             return vent;
         }
@@ -114,10 +114,10 @@ module.exports = function(config,
             handlers
                 .filter(h=> {
                     logger.info('calling event handler :' + h.eventHandlerName);
-                    return h.handlesEvents.find(he=>he == vent.eventName)
+                    return h.handlesEvents.find(he=>he == vent.eventTypeName)
                 })
                 .forEach(m=> {
-                    logger.debug('event handler does handle event type: ' + vent.eventName);
+                    logger.debug('event handler does handle event type: ' + vent.eventTypeName);
                     m.handleEvent(vent);
                     logger.debug('event handler finished handleing event');
                 });

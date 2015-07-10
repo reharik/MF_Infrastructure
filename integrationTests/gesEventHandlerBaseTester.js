@@ -42,12 +42,12 @@ describe('gesEventHandlerBaseTester', function() {
     context('when calling gesDispatcher with success', ()=> {
         it('should submit proper notification event', (done)=> {
             appendData = { expectedVersion: -2, some:'data' };
-            appendData.events = [new EventData(uuid.v4(), 'testing1', appendData,{eventTypeName:'testingEventNotificationOn', continuationId:continuationId})];
+            appendData.events = [new EventData('testing1',{eventTypeName:'testingEventNotificationOn', continuationId:continuationId}, appendData)];
             append('dispatchStream',appendData);
 
             setTimeout(()=>{
                 notificationHandler.eventsHandled.length.must.be.at.least(1);
-                demand(notificationHandler.eventsHandled.find(x=>x.eventName != 'notificationEvent')).be.undefined();
+                demand(notificationHandler.eventsHandled.find(x=>x.eventTypeName != 'notificationEvent')).be.undefined();
                 console.log(continuationId);
                 console.log(notificationHandler.eventsHandled.filter(x=>x.metadata.continuationId== continuationId ));
                 notificationHandler.eventsHandled.filter(x=>x.metadata.continuationId == continuationId).length.must.be.at.least(1);
@@ -62,12 +62,12 @@ describe('gesEventHandlerBaseTester', function() {
     context('when calling gesDispatcher with failure', ()=> {
         it('should submit proper notification event', (done)=> {
             appendData = { expectedVersion: -2, some:'data' };
-            appendData.events = [new EventData(uuid.v4(), 'testing1', appendData,{eventTypeName:'someExceptionNotificationOn', continuationId:continuationId})];
+            appendData.events = [new EventData('testing1', appendData,{eventTypeName:'someExceptionNotificationOn', continuationId:continuationId})];
             append('dispatchStream',appendData);
 
             setTimeout(()=>{
                 notificationHandler.eventsHandled.length.must.be.at.least(1);
-                demand(notificationHandler.eventsHandled.find(x=>x.eventName != 'notificationEvent')).be.undefined();
+                demand(notificationHandler.eventsHandled.find(x=>x.eventTypeName != 'notificationEvent')).be.undefined();
                 console.log(continuationId);
                 console.log(notificationHandler.eventsHandled.filter(x=>x.metadata.continuationId== continuationId ));
                 notificationHandler.eventsHandled.filter(x=>x.metadata.continuationId == continuationId).length.must.be.at.least(1);

@@ -27,11 +27,8 @@ module.exports = function(invariant) {
         version() { return this._version };
 
         applyEvent(event) {
-            console.log('event');
-            console.log(event);
-            var key = Object.keys(this.applyEventHandlers()).find(x=>x === event.eventName);
+            var key = Object.keys(this.applyEventHandlers()).find(x=>x === event.eventTypeName);
             if (key) {
-                console.log('applying event');
                 this.applyEventHandlers()[key](event);
             }
             this._version++;
