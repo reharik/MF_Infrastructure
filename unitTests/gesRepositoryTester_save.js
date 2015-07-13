@@ -16,6 +16,7 @@ describe('getEventStoreRepository', function() {
     var gesConnection;
     var streamNameStrategy;
     var GesEvent;
+    var JSON;
 
     before(function(){
         container = require('../testBootstrap');
@@ -24,6 +25,7 @@ describe('getEventStoreRepository', function() {
         uuid = container.getInstanceOf('uuid');
         TestAgg = container.getInstanceOf('testAgg');
         GesEvent = container.getInstanceOf('GesEvent');
+        JSON = container.getInstanceOf('JSON');
         mut = container.getInstanceOf('gesRepository')();
     });
 
@@ -34,7 +36,7 @@ describe('getEventStoreRepository', function() {
     describe('#save', function() {
         context('when calling save with bad aggtype', function () {
             it('should throw proper error', function () {
-                return mut.save(badAgg,'','').must.reject.error(Error, 'Invariant Violation: aggregateType must inherit from AggregateBase');
+                (function(){mut.save(badAgg,'','')}).must.throw(Error, 'Invariant Violation: aggregateType must inherit from AggregateBase');
             })
         });
 

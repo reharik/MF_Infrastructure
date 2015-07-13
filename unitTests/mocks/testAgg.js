@@ -37,6 +37,7 @@ module.exports = function (AggregateRootBase, GesEvent) {
         applyEventHandlers() {
             return {
                 'someAggEvent': function (event) {
+                    console.log("HERE");
                     this.eventsHandled.push(event);
                 }.bind(this),
                 'someOtherAggEvent': function (event) {

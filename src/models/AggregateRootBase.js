@@ -22,10 +22,6 @@ module.exports = function(invariant) {
             Object.assign(this, this.commandHandlers());
         }
 
-        id() { return this._id };
-
-        version() { return this._version };
-
         applyEvent(event) {
             var key = Object.keys(this.applyEventHandlers()).find(x=>x === event.eventTypeName);
             if (key) {

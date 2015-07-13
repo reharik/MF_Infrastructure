@@ -12,6 +12,8 @@ describe('gesDispatcher', function() {
     var mut;
     var TestHandler;
     var testHandler;
+    var JSON;
+
     before(function(){
         container = require('../testBootstrap');
         GesEvent = container.getInstanceOf('GesEvent');
@@ -19,6 +21,7 @@ describe('gesDispatcher', function() {
         mod = container.getInstanceOf('gesDispatcher');
         TestHandler = container.getInstanceOf('TestEventHandler');
         testHandler = new TestHandler();
+        JSON = container.getInstanceOf('JSON');
         mut = new mod({handlers:[testHandler]});
 
     });
@@ -81,7 +84,7 @@ describe('gesDispatcher', function() {
                 var subscription = gesConnection.getSubscription();
                 console.log(subscription);
                 var eventData = {
-                    Event:{Type:'someEventNotificationOn'},
+                    Event:{EventType:'someEventNotificationOn'},
                     OriginalPosition:{},
                     OriginalEvent:{
                         Metadata:{eventTypeName:'someEventNotificationOn'},
@@ -97,7 +100,7 @@ describe('gesDispatcher', function() {
                 mut.startDispatching();
                 var subscription = gesConnection.getSubscription();
                 var eventData = {
-                    Event:{Type:'someEventNotificationOn'},
+                    Event:{EventType:'someEventNotificationOn'},
                     OriginalPosition:'the originalPosition',
                     OriginalEvent:{
                         Metadata:{eventTypeName:'someEventNotificationOn'},
@@ -113,7 +116,7 @@ describe('gesDispatcher', function() {
                 mut.startDispatching();
                 var subscription = gesConnection.getSubscription();
                 var eventData = {
-                    Event:{Type:'someEventNotificationOn'},
+                    Event:{EventType:'someEventNotificationOn'},
                     OriginalPosition:'the originalPosition',
                     OriginalEvent:{
                         Metadata:{eventTypeName:'someEventNotificationOn'},
@@ -137,7 +140,7 @@ describe('gesDispatcher', function() {
                 mut.startDispatching();
                 var subscription = gesConnection.getSubscription();
                 var eventData = {
-                    Event:{Type:'$testEvent'},
+                    Event:{EventType:'$testEvent'},
                     OriginalPosition:{},
                     OriginalEvent:{
                         Metadata:{eventTypeName:'someEventNotificationOn'},
@@ -152,7 +155,7 @@ describe('gesDispatcher', function() {
                 mut.startDispatching();
                 var subscription = gesConnection.subscribeToStream();
                 var eventData = {
-                    Event:{Type:'testEvent'},
+                    Event:{EventType:'testEvent'},
                     OriginalPosition:{},
                     OriginalEvent:{
                         Metadata:{},
@@ -167,7 +170,7 @@ describe('gesDispatcher', function() {
                 mut.startDispatching();
                 var subscription = gesConnection.subscribeToStream();
                 var eventData = {
-                    Event:{Type:'testEvent'},
+                    Event:{EventType:'testEvent'},
                     OriginalPosition:{},
                     OriginalEvent:{
                         Metadata:{eventTypeName:'someEventNotificationOn'},

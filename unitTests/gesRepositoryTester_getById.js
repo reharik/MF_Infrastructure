@@ -15,6 +15,7 @@ describe('getEventStoreRepository', function() {
     var gesConnection;
     var streamNameStrategy;
     var GesEvent;
+    var JSON;
 
     before(function(){
         container = require('../testBootstrap');
@@ -23,6 +24,7 @@ describe('getEventStoreRepository', function() {
         uuid = container.getInstanceOf('uuid');
         TestAgg = container.getInstanceOf('testAgg');
         GesEvent = container.getInstanceOf('GesEvent');
+        JSON = container.getInstanceOf('JSON');
         mut = container.getInstanceOf('gesRepository')();
     });
 
@@ -49,7 +51,9 @@ describe('getEventStoreRepository', function() {
                 var result = {
                     Status: 'OK',
                     NextEventNumber:3,
-                    Events: [{Event:{Type:'someAggEvent',Data: data}},{Event:{Type:'someAggEvent',Data: data}},{Event:{Type:'someAggEvent',Data: data}}],
+                    Events: [{OriginalEvent:{EventType:'someAggEvent',Data: data, Metadata: {eventTypeName:'someEventNotificationOn'}}},
+                        {OriginalEvent:{EventType:'someAggEvent',Data: data, Metadata: {eventTypeName:'someEventNotificationOn'}}},
+                        {OriginalEvent:{EventType:'someAggEvent',Data: data, Metadata: {eventTypeName:'someEventNotificationOn'}}}],
                     IsEndOfStream: false
                 };
                 gesConnection.readStreamEventForwardShouldReturnResult(result);
@@ -59,6 +63,15 @@ describe('getEventStoreRepository', function() {
         });
         context('when calling getById with multiple events returned',function (){
             it('should return apply all events and presumably loop', async function () {
+                var result = {
+                    Status: 'OK',
+                    NextEventNumber:3,
+                    Events: [{OriginalEvent:{EventType:'someAggEvent', Metadata: {eventTypeName:'someAggEvent'}}},
+                        {OriginalEvent:{EventType:'someAggEvent', Metadata: {eventTypeName:'someAggEvent'}}},
+                        {OriginalEvent:{EventType:'someAggEvent', Metadata: {eventTypeName:'someAggEvent'}}}],
+                    IsEndOfStream: false
+                };
+                gesConnection.readStreamEventForwardShouldReturnResult(result);
                 var agg = await mut.getById(TestAgg,uuid.v1(),0);
                 agg.getEventsHandled().length.must.equal(3);
             })
@@ -77,7 +90,9 @@ describe('getEventStoreRepository', function() {
                 var result = {
                     Status: 'StreamDeleted',
                     NextEventNumber:3,
-                    Events: [{Event:{Type:'someEventNotificationOn',Data: data}},{Event:{Type:'someEventNotificationOn',Data: data}},{Event:{Type:'someEventNotificationOn',Data: data}}],
+                    Events: [{Event:{EventType:'someAggEvent',Data: data, OriginalEvent: {Metadata: {eventTypeName:'someEventNotificationOn'}}}},
+                        {Event:{EventType:'someAggEvent',Data: data, OriginalEvent: {Metadata: {eventTypeName:'someEventNotificationOn'}}}},
+                        {Event:{EventType:'someAggEvent',Data: data, OriginalEvent: {Metadata: {eventTypeName:'someEventNotificationOn'}}}}],
                     IsEndOfStream: false
                 };
                 var id = uuid.v1();
@@ -93,7 +108,9 @@ describe('getEventStoreRepository', function() {
                     var result = {
                     Status: 'StreamNotFound',
                     NextEventNumber:3,
-                    Events: [{Event:{Type:'someEventNotificationOn',Data: data}},{Event:{Type:'someEventNotificationOn',Data: data}},{Event:{Type:'someEventNotificationOn',Data: data}}],
+                        Events: [{Event:{EventType:'someAggEvent',Data: data, OriginalEvent: {Metadata: {eventTypeName:'someEventNotificationOn'}}}},
+                            {Event:{EventType:'someAggEvent',Data: data, OriginalEvent: {Metadata: {eventTypeName:'someEventNotificationOn'}}}},
+                            {Event:{EventType:'someAggEvent',Data: data, OriginalEvent: {Metadata: {eventTypeName:'someEventNotificationOn'}}}}],
                     IsEndOfStream: false
                 };
                 var id = uuid.v1();

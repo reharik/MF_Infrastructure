@@ -19,7 +19,7 @@ describe('gesEventHandlerBaseTester', function() {
     var continuationId;
 
     before( function () {
-        bootstrap = require('../bootstrap');
+        bootstrap = require('../intTestBootstrap');
 
     });
 
@@ -41,8 +41,8 @@ describe('gesEventHandlerBaseTester', function() {
 
     context('when calling gesDispatcher with success', ()=> {
         it('should submit proper notification event', (done)=> {
-            appendData = { expectedVersion: -2, some:'data' };
-            appendData.events = [new EventData('testing1',{eventTypeName:'testingEventNotificationOn', continuationId:continuationId}, appendData)];
+            appendData = { expectedVersion: -2 };
+            appendData.events = [new EventData('testingEventNotificationOn',{eventTypeName:'testingEventNotificationOn', continuationId:continuationId}, {data:'somedata'})];
             append('dispatchStream',appendData);
 
             setTimeout(()=>{
@@ -60,9 +60,9 @@ describe('gesEventHandlerBaseTester', function() {
     });
 
     context('when calling gesDispatcher with failure', ()=> {
-        it('should submit proper notification event', (done)=> {
+        it('should submit proper notification event', (done) => {
             appendData = { expectedVersion: -2, some:'data' };
-            appendData.events = [new EventData('testing1', appendData,{eventTypeName:'someExceptionNotificationOn', continuationId:continuationId})];
+            appendData.events = [new EventData('someExceptionNotificationOn',{eventTypeName:'someExceptionNotificationOn', continuationId:continuationId}, appendData)];
             append('dispatchStream',appendData);
 
             setTimeout(()=>{
@@ -72,11 +72,8 @@ describe('gesEventHandlerBaseTester', function() {
                 console.log(notificationHandler.eventsHandled.filter(x=>x.metadata.continuationId== continuationId ));
                 notificationHandler.eventsHandled.filter(x=>x.metadata.continuationId == continuationId).length.must.be.at.least(1);
                 notificationHandler.eventsHandled.filter(x=>x.metadata.continuationId == continuationId)[0].data.notificationType.must.equal('Failure');
-
-
                 done();
             }, 1500);
-
         });
     });
 });

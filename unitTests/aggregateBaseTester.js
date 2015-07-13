@@ -5,13 +5,14 @@ var container;
 var testAgg;
 var testAggNoCMDHandlers;
 var testAggNoEventHandlers;
-
+var JSON;
 
 describe('aggregateFunctionality', function() {
     var mut;
 
     before(function(){
         container = require('../testBootstrap');
+        JSON = container.getInstanceOf('JSON');
         testAgg = container.getInstanceOf('testAgg');
         testAggNoCMDHandlers = container.getInstanceOf('testAggNoCMDHandlers');
         testAggNoEventHandlers = container.getInstanceOf('testAggNoEventHandlers');

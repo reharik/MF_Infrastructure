@@ -14,7 +14,7 @@ describe('repositoryTester', function() {
     var testAgg;
 
     before( function () {
-        bootstrap = require('../bootstrap');
+        bootstrap = require('../intTestBootstrap');
 
     });
 
@@ -33,11 +33,10 @@ describe('repositoryTester', function() {
             testAgg.someCommand({value:'something Really important!'});
             testAgg.someCommand({value:'not wait. I mean something REALLY important!'});
             await mut.save(testAgg,null,{metametadata:'data'});
-            //setInterval(async function(){
-                var agg = await mut.getById(TestAgg,testAgg._id,1);
-                console.log(agg);
-                agg._version.must.equal(2);
-        //},1000, this)
+            var agg = await mut.getById(TestAgg,testAgg._id,1);
+            agg._version.must.equal(2);
+            agg.eventsHandled.length.must.equal(2);
+            agg.eventsHandled[0].metadata.metametadata.must.equal('data');
         });
     });
 });

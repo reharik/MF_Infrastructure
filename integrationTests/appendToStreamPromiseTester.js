@@ -12,7 +12,7 @@ describe('appendToStreamPromiseTester', function() {
     var uuid;
 
     before(function(){
-        bootstrap = require('../bootstrap');
+        bootstrap = require('../intTestBootstrap');
         EventData = bootstrap.getInstanceOf('EventData');
         uuid = bootstrap.getInstanceOf('uuid');
         mut = bootstrap.getInstanceOf('appendToStreamPromise');

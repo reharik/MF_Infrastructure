@@ -6,8 +6,9 @@ module.exports = function(uuid) {
     return function EventData(eventTypeName, metadata, data) {
         metadata = metadata || {};
         data = JSON.stringify(data || {});
-        metadata = JSON.stringify(metadata||{});
-        //metadata.eventTypeName = eventTypeName;
+        metadata = metadata||{};
+        metadata.eventTypeName = eventTypeName;
+        metadata = JSON.stringify(metadata);
 
         return {
             EventId: uuid.v4(),

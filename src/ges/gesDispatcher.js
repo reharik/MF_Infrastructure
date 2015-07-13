@@ -63,6 +63,9 @@ module.exports = function(config,
             var relevantEvents = rx.Observable.fromEvent(subscription, 'event')
                 .filter(this.filterEvents, this)
                 .map(this.createGesEvent, this);
+            //console.log('relevantEvents');
+            //console.log(relevantEvents);
+            //relevantEvents.forEach(x=> console.log(x));
             relevantEvents.forEach(vent => this.serveEventToHandlers(vent,this.options.handlers),
                 error => { throw error; }
             );
@@ -72,7 +75,7 @@ module.exports = function(config,
         filterEvents(payload) {
             //logger.info('event received by dispatcher');
             //logger.trace('filtering event for system events ($)');
-            if (payload.Event.Type.startsWith('$')) {
+            if (!payload.Event || !payload.Event.EventType || payload.Event.EventType.startsWith('$')) {
                 return false;
             }
             //logger.trace('event passed filter for system events ($)');

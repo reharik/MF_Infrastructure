@@ -11,6 +11,7 @@ describe('gesEventHandlerBase', function() {
     var uuid;
     var expectIdempotence;
     var container;
+    var JSON;
 
     before(function(){
         container = require('../testBootstrap');
@@ -18,6 +19,7 @@ describe('gesEventHandlerBase', function() {
         GesEvent = container.getInstanceOf('GesEvent');
         uuid = container.getInstanceOf('uuid');
         expectIdempotence = require('./mocks/expectIdempotenceMock')();
+        JSON = container.getInstanceOf('JSON');
         mut = new TestHandler();
     });
     beforeEach(function(){

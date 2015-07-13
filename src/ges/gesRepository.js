@@ -11,6 +11,7 @@ module.exports = function(invariant,
                           AggregateRootBase,
                           _,
                           EventData,
+                          GesEvent,
                           appendToStreamPromise,
                           readStreamEventsForwardPromise,
                           streamNameStrategy,
@@ -108,7 +109,7 @@ module.exports = function(invariant,
                     logger.trace('new sliceStart calculated: ' + sliceStart);
 
                     logger.debug('about to loop through and apply events to aggreagate');
-                    currentSlice.Events.forEach(e=>aggregate.applyEvent(JSON.parse(e.Event.Data)));
+                    currentSlice.Events.forEach(e=> aggregate.applyEvent(GesEvent.gesEventFromStream(e,'eventTypeName')));
                     logger.info('events applied to aggregate');
                 } while (version >= currentSlice.NextEventNumber && !currentSlice.IsEndOfStream);
             } catch (error) {
@@ -151,13 +152,13 @@ module.exports = function(invariant,
                 _.assign(metadata, _metadata);
                 logger.debug('merged metadata: ' + metadata);
 
-                streamName = streamNameStrategy(aggregate.constructor.name, aggregate.id());
+                streamName = streamNameStrategy(aggregate.constructor.name, aggregate._id);
                 logger.debug('gesRepo calling save with params:' + aggregate + ', ' + commitId + ', ' + _metadata);
                 logger.trace('retrieving uncommited events');
                 newEvents = aggregate.getUncommittedEvents();
 
-                originalVersion = aggregate.version() - newEvents.length;
-                logger.trace('calculating original version number:' + aggregate.version() + ' - ' + newEvents.length + ' = ' + originalVersion);
+                originalVersion = aggregate._version - newEvents.length;
+                logger.trace('calculating original version number:' + aggregate._version + ' - ' + newEvents.length + ' = ' + originalVersion);
                 expectedVersion = originalVersion == 0 ? -1 : originalVersion - 1;
                 logger.trace('calculating expected version :' + expectedVersion);
 
