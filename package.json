@@ -2,7 +2,7 @@
   "name": "MF_Core",
   "version": "0.0.0",
   "private": true,
-  "main": "app.js",
+  "main": "index.js",
   "scripts": {
     "start": "gulp dev",
     "test": "mocha --opts unitTests/mocha.opts unitTests",
