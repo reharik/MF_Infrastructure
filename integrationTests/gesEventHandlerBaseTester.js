@@ -42,7 +42,7 @@ describe('gesEventHandlerBaseTester', function() {
     context('when calling gesDispatcher with success', ()=> {
         it('should submit proper notification event', (done)=> {
             appendData = { expectedVersion: -2 };
-            appendData.events = [new EventData('testingEventNotificationOn',{eventTypeName:'testingEventNotificationOn', continuationId:continuationId}, {data:'somedata'})];
+            appendData.events = [new EventData('testingEventNotificationOn', {data:'somedata'},{eventTypeName:'testingEventNotificationOn', continuationId:continuationId})];
             append('dispatchStream',appendData);
 
             setTimeout(()=>{
@@ -62,7 +62,7 @@ describe('gesEventHandlerBaseTester', function() {
     context('when calling gesDispatcher with failure', ()=> {
         it('should submit proper notification event', (done) => {
             appendData = { expectedVersion: -2, some:'data' };
-            appendData.events = [new EventData('someExceptionNotificationOn',{eventTypeName:'someExceptionNotificationOn', continuationId:continuationId}, appendData)];
+            appendData.events = [new EventData('someExceptionNotificationOn', appendData,{eventTypeName:'someExceptionNotificationOn', continuationId:continuationId})];
             append('dispatchStream',appendData);
 
             setTimeout(()=>{

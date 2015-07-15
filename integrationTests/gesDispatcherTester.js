@@ -31,7 +31,7 @@ describe('gesDispatcher', function() {
         mut = new Mut({handlers:[testEventHandler]});
         mut.startDispatching();
         appendData = { expectedVersion: -2, some:'data' };
-        appendData.events = [new EventData('testingEventNotificationOn',{eventTypeName:'testingEventNotificationOn'}, appendData)];
+        appendData.events = [new EventData('testingEventNotificationOn', appendData,{eventTypeName:'testingEventNotificationOn'})];
         append('dispatchStream',appendData);
     });
 

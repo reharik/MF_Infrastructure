@@ -39,7 +39,7 @@ describe('appendToStreamPromiseTester', function() {
 
         it('should resolve with success', async ()=> {
             var appendData = { expectedVersion: -2};
-            appendData.events = [new EventData( 'testing1', {eventTypeName:'testingEventNotificationOff'}, { data:'someData' })];
+            appendData.events = [new EventData( 'testing1', { data:'someData' }, {eventTypeName:'testingEventNotificationOff'})];
             var result = await mut('myTestStream',appendData);
             result.Status.must.equal('Success');
         })

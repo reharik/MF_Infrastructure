@@ -1,12 +1,12 @@
 /**
  * Created by rharik on 6/23/15.
  */
-var container = require('./src/dependz/Container');
+var container = require('./node_modules/dependz/index');
 
 
 module.exports =  function(optionalRegistry) {
     var rootRegistry = x=>
-        x.pathToPackageJson('/package.json')
+        x.pathToRoot(__dirname)
             .replace('lodash').withThis('_')
             .replace('bluebird').withThis('Promise')
             .complete();

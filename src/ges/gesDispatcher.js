@@ -103,8 +103,8 @@ module.exports = function(config,
         createGesEvent(payload) {
             logger.debug('event passed through filter');
             var vent =  new GesEvent(bufferToJson(payload.OriginalEvent.Metadata)[this.options.targetType],
-                payload.OriginalEvent.Metadata,
                 payload.OriginalEvent.Data,
+                payload.OriginalEvent.Metadata,
                 payload.OriginalPosition
             );
             logger.info('event transfered into gesEvent: ' + JSON.stringify(vent));

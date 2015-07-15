@@ -39,7 +39,7 @@ describe('gesEventHandlerBase', function() {
                 TestHandler = container.getInstanceOf('TestEventHandler');
                 mut = new TestHandler();
 
-                var eventData =new GesEvent('someExceptionNotificationOff',{eventTypeName:'someExceptionNotificationOff'},{'some':'data'});
+                var eventData =new GesEvent('someExceptionNotificationOff',{'some':'data'},{eventTypeName:'someExceptionNotificationOff'});
                 var result = await mut.handleEvent(eventData);
                 mut.eventsHandled.length.must.equal(0);
             })
@@ -51,7 +51,7 @@ describe('gesEventHandlerBase', function() {
                 TestHandler = container.getInstanceOf('TestEventHandler');
                 mut = new TestHandler();
 
-                var eventData =new GesEvent('someExceptionNotificationOn',{eventTypeName:'someExceptionNotificationOn'},{'some':'data'});
+                var eventData =new GesEvent('someExceptionNotificationOn',{'some':'data'},{eventTypeName:'someExceptionNotificationOn'});
                 var result = await mut.handleEvent(eventData);
                 console.log('JSON.parse(result.data.events[0]');
                 console.log(result.data.events);
@@ -65,7 +65,7 @@ describe('gesEventHandlerBase', function() {
                 TestHandler = container.getInstanceOf('TestEventHandler');
                 mut = new TestHandler();
 
-                var eventData =new GesEvent('someExceptionNotificationOff',{eventTypeName:'someExceptionNotificationOff'},{'some':'data'});
+                var eventData =new GesEvent('someExceptionNotificationOff',{'some':'data'},{eventTypeName:'someExceptionNotificationOff'});
                 var result = await mut.handleEvent(eventData);
                 demand(result).be.undefind;
             })
@@ -78,7 +78,7 @@ describe('gesEventHandlerBase', function() {
                 TestHandler = container.getInstanceOf('TestEventHandler');
                 mut = new TestHandler();
 
-                var eventData =new GesEvent('someEventNotificationOn',{eventTypeName:'someEventNotificationOn'},{'some':'data'});
+                var eventData =new GesEvent('someEventNotificationOn',{'some':'data'},{eventTypeName:'someEventNotificationOn'});
                 var result = await mut.handleEvent(eventData);
                 JSON.parse(result.data.events[0].Data).notificationType.must.equal('Success');
             })
@@ -90,7 +90,7 @@ describe('gesEventHandlerBase', function() {
                 TestHandler = container.getInstanceOf('TestEventHandler');
                 mut = new TestHandler();
 
-                var eventData =new GesEvent('someEventNotificationOff',{eventTypeName:'someEventNotificationOff'},{'some':'data'});
+                var eventData =new GesEvent('someEventNotificationOff',{'some':'data'},{eventTypeName:'someEventNotificationOff'});
                 var result = await mut.handleEvent(eventData);
                 demand(result).be.undefind;
 
@@ -100,7 +100,7 @@ describe('gesEventHandlerBase', function() {
         context('when calling handler that DOES NOT throws an exception', function () {
             it('should process event', async function () {
                 container.inject({name:'expectIdempotence', resolvedInstance:expectIdempotence(true)});
-                var eventData =new GesEvent('someEventNotificationOff',{eventTypeName:'someEventNotificationOff'},{'some':'data'});
+                var eventData =new GesEvent('someEventNotificationOff',{'some':'data'},{eventTypeName:'someEventNotificationOff'});
                 TestHandler = container.getInstanceOf('TestEventHandler');
                 mut = new TestHandler();
 
@@ -114,11 +114,8 @@ describe('gesEventHandlerBase', function() {
                 TestHandler = container.getInstanceOf('TestEventHandler');
                 mut = new TestHandler();
                 var continuationId = uuid.v1();
-                var eventData =new GesEvent('someEventNotificationOn',{eventTypeName:'someEventNotificationOn', continuationId:continuationId},{'some':'data'});
+                var eventData =new GesEvent('someEventNotificationOn',{'some':'data'},{eventTypeName:'someEventNotificationOn', continuationId:continuationId});
                 var result = await mut.handleEvent(eventData);
-
-                console.log('result');
-                console.log(result.data.events);
 
                 result.data.expectedVersion.must.equal(-2);
                 result.data.events[0].EventId.length.must.equal(36);

@@ -37,9 +37,9 @@ module.exports = function(NotificationEvent, appendToStreamPromise, expectIdempo
 
                     var responseEvent = new EventData(
                         this.responseMessage.eventTypeName,
+                        this.responseMessage.data,
                         {"continuationId": this.continuationId,
-                        "eventTypeName":"notificationEvent"},
-                        this.responseMessage.data);
+                        "eventTypeName":"notificationEvent"});
 
                     logger.debug('response event created: ' + JSON.stringify(responseEvent));
 
@@ -63,7 +63,6 @@ module.exports = function(NotificationEvent, appendToStreamPromise, expectIdempo
 
             this.responseMessage = new NotificationEvent("Success", "Success", gesEvent);
             this.continuationId = gesEvent.metadata.continuationId;
-
             logger.trace('getting continuation Id: ' + this.continuationId);
 
         }

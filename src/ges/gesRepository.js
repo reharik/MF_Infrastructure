@@ -163,7 +163,7 @@ module.exports = function(invariant,
                 logger.trace('calculating expected version :' + expectedVersion);
 
                 logger.debug('creating EventData for each event');
-                events = newEvents.map(x=> new EventData(x.eventTypeName, metadata, x.data));
+                events = newEvents.map(x=> new EventData(x.eventTypeName, x.data, metadata));
                 logger.trace('EventData created for each event');
 
                 appendData = {

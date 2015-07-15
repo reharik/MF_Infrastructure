@@ -43,7 +43,7 @@ describe('getEventStoreRepository', function() {
         context('when calling save agg for first time', function () {
             it('should create id', async function () {
                 testAgg = new TestAgg();
-                testAgg.raiseEvent(new GesEvent('someAggEvent',null,null,{variousProperties:"yeehaw"}));
+                testAgg.raiseEvent(new GesEvent('someAggEvent',null,{variousProperties:"yeehaw"}));
                 await mut.save(testAgg, uuid.v1(), '');
                 testAgg._id.length.must.equal(36);
             })
@@ -52,7 +52,7 @@ describe('getEventStoreRepository', function() {
         context('when calling save agg that already has id', function () {
             it('should not overwrite it', async function () {
                 testAgg = new TestAgg();
-                testAgg.raiseEvent(new GesEvent('someAggEvent',null,null,{variousProperties:"yeehaw"}));
+                testAgg.raiseEvent(new GesEvent('someAggEvent',null,{variousProperties:"yeehaw"}));
                 var id = uuid.v1();
                 testAgg._id = id;
                 await mut.save(testAgg, uuid.v1(), '');
@@ -65,9 +65,9 @@ describe('getEventStoreRepository', function() {
             it('should create proper stream name', async function () {
                 testAgg = new TestAgg();
 
-                testAgg.raiseEvent(new GesEvent('someAggEvent',null,null,{variousProperties:"yeehaw"}));
-                testAgg.raiseEvent(new GesEvent('someAggEvent',null,null,{variousProperties:"yeehaw"}));
-                testAgg.raiseEvent(new GesEvent('someAggEvent',null,null,{variousProperties:"yeehaw"}));
+                testAgg.raiseEvent(new GesEvent('someAggEvent',null,{variousProperties:"yeehaw"}));
+                testAgg.raiseEvent(new GesEvent('someAggEvent',null,{variousProperties:"yeehaw"}));
+                testAgg.raiseEvent(new GesEvent('someAggEvent',null,{variousProperties:"yeehaw"}));
                 testAgg._id = uuid.v1();
                 var result = await mut.save(testAgg, uuid.v1(), '');
                 result.streamName.must.equal(streamNameStrategy('TestAgg', testAgg._id));
@@ -75,9 +75,9 @@ describe('getEventStoreRepository', function() {
         });
         context('when calling save with proper aggtype', function () {
             it('should save proper number of events', async function () {
-                testAgg.raiseEvent(new GesEvent('someAggEvent',null,null,{variousProperties:"yeehaw"}));
-                testAgg.raiseEvent(new GesEvent('someAggEvent',null,null,{variousProperties:"yeehaw"}));
-                testAgg.raiseEvent(new GesEvent('someAggEvent',null,null,{variousProperties:"yeehaw"}));
+                testAgg.raiseEvent(new GesEvent('someAggEvent',null,{variousProperties:"yeehaw"}));
+                testAgg.raiseEvent(new GesEvent('someAggEvent',null,{variousProperties:"yeehaw"}));
+                testAgg.raiseEvent(new GesEvent('someAggEvent',null,{variousProperties:"yeehaw"}));
                 testAgg._id = uuid.v1();
                 var result = await mut.save(testAgg, uuid.v1(), '');
                 result.data.events.length.must.equal(3);
@@ -85,7 +85,7 @@ describe('getEventStoreRepository', function() {
         });
         context('when calling save with proper aggtype', function () {
             it('should add proper metadata to events', async function () {
-                testAgg.raiseEvent(new GesEvent('someAggEvent',null,null,{variousProperties:"yeehaw"}));
+                testAgg.raiseEvent(new GesEvent('someAggEvent',null,{variousProperties:"yeehaw"}));
                 testAgg._id = uuid.v1();
                 var commitId = uuid.v1();
                 var result = await mut.save(testAgg, commitId, '');
@@ -110,9 +110,9 @@ describe('getEventStoreRepository', function() {
         });
         context('when calling save on new aggregate', function () {
             it('should calculate proper version number', async function () {
-                testAgg.raiseEvent(new GesEvent('someAggEvent',null,null,{variousProperties:"yeehaw"}));
-                testAgg.raiseEvent(new GesEvent('someAggEvent',null,null,{variousProperties:"yeehaw"}));
-                testAgg.raiseEvent(new GesEvent('someAggEvent',null,null,{variousProperties:"yeehaw"}));
+                testAgg.raiseEvent(new GesEvent('someAggEvent',null,{variousProperties:"yeehaw"}));
+                testAgg.raiseEvent(new GesEvent('someAggEvent',null,{variousProperties:"yeehaw"}));
+                testAgg.raiseEvent(new GesEvent('someAggEvent',null,{variousProperties:"yeehaw"}));
                 testAgg._id = uuid.v1();
                 var result = await mut.save(testAgg, uuid.v1(), '');
                 result.data.expectedVersion.must.equal(-1);
@@ -122,9 +122,9 @@ describe('getEventStoreRepository', function() {
         context('when calling save on new aggregate', function () {
             it('should calculate proper version number', async function () {
                 testAgg._version = 5;
-                testAgg.raiseEvent(new GesEvent('someAggEvent',null,null,{variousProperties:"yeehaw"}));
-                testAgg.raiseEvent(new GesEvent('someAggEvent',null,null,{variousProperties:"yeehaw"}));
-                testAgg.raiseEvent(new GesEvent('someAggEvent',null,null,{variousProperties:"yeehaw"}));
+                testAgg.raiseEvent(new GesEvent('someAggEvent',null,{variousProperties:"yeehaw"}));
+                testAgg.raiseEvent(new GesEvent('someAggEvent',null,{variousProperties:"yeehaw"}));
+                testAgg.raiseEvent(new GesEvent('someAggEvent',null,{variousProperties:"yeehaw"}));
                 testAgg._id = uuid.v1();
                 var result = await mut.save(testAgg, uuid.v1(), '');
                 result.data.expectedVersion.must.equal(4);

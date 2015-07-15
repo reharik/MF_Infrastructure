@@ -20,7 +20,7 @@ describe('readStreamEventsForwardPromiseTester', function() {
         var EventData = bootstrap.getInstanceOf('EventData');
         var append = bootstrap.getInstanceOf('appendToStreamPromise');
         var appendData = { expectedVersion: -2 };
-        appendData.events = [new EventData('testing1', appendData)];
+        appendData.events = [new EventData('testing1', {}, appendData)];
         append('readStream',appendData);
     });
 

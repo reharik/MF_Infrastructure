@@ -30,26 +30,6 @@ describe('gesDispatcher', function() {
         gesConnection.clean();
     });
 
-    describe('#Instanciate Dispatcher', function() {
-        context('when instanciating dispatcher with no handlers', function () {
-            it('should throw proper error',  function () {
-
-                console.log('gesConnection');
-                //console.log(connection);
-                gesConnection.subscribeToStream();
-                gesConnection.getSubscription().on('fuck', function(data){console.log(data)});
-                gesConnection.appendToStream('fuck',{name:'FUCCKCKCK'},function(){console.log('hello')});
-
-                console.log("connection.getSubscription()1");
-                console.log(gesConnection.getSubscription());
-                var gesConnection2 = container.getInstanceOf('gesConnection');
-
-                console.log("connection.getSubscription()2");
-                console.log(gesConnection2.getSubscription());
-            })
-        });
-    });
-
 
     describe('#Instanciate Dispatcher', function() {
         context('when instanciating dispatcher with no handlers', function () {

@@ -47,7 +47,7 @@ describe('getEventStoreRepository', function() {
         });
         context('when calling getById with proper args',function (){
             it('should return proper agg', async function () {
-                var data = JSON.stringify(new GesEvent('someAggEvent',null,null,{blah:'blah'}));
+                var data = JSON.stringify(new GesEvent('someAggEvent',null,{blah:'blah'}));
                 var result = {
                     Status: 'OK',
                     NextEventNumber:3,
@@ -86,7 +86,7 @@ describe('getEventStoreRepository', function() {
 
         context('when calling getById with proper args but stream deleted', function (){
             it('should throw proper error', function () {
-                var data = JSON.stringify(new GesEvent('someEventNotificationOn',null,null,{blah:'blah'}));
+                var data = JSON.stringify(new GesEvent('someEventNotificationOn',null,{blah:'blah'}));
                 var result = {
                     Status: 'StreamDeleted',
                     NextEventNumber:3,
@@ -104,7 +104,7 @@ describe('getEventStoreRepository', function() {
         });
         context('when calling getById with proper args but stream not found', function (){
             it('should throw proper error', function () {
-                var data = JSON.stringify(new GesEvent('someEventNotificationOn',null,null,{blah:'blah'}));
+                var data = JSON.stringify(new GesEvent('someEventNotificationOn',null,{blah:'blah'}));
                     var result = {
                     Status: 'StreamNotFound',
                     NextEventNumber:3,

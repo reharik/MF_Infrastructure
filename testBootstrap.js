@@ -1,10 +1,10 @@
 /**
  * Created by rharik on 6/23/15.
  */
-var container = require('./src/dependz/Container');
+var bootstrap = require('./node_modules/dependz/index');
 
-module.exports = new container(x=>
-        x.pathToPackageJson('/package.json')
+module.exports = new bootstrap(x=>
+        x.pathToRoot(__dirname)
         .forDependencyParam('testAgg').requireThisInternalModule("/unitTests/mocks/testAgg")
         .forDependencyParam('testAggNoCMDHandlers').requireThisInternalModule("/unitTests/mocks/testAggNoCMDHandlers")
         .forDependencyParam('testAggNoEventHandlers').requireThisInternalModule("/unitTests/mocks/testAggNoEventHandlers")
