@@ -18,7 +18,7 @@ describe('gesConnection', function() {
 
     context('passing proper args', ()=> {
         it('should should return a connection', function () {
-            mut = bootstrap.getInstanceOf('gesConnection');
+            mut = bootstrap.getInstanceOf('gesConnection')();
             console.log(mut);
             mut.must.not.be.null();
             mut._handler._connectingPhase.must.equal('Connected');
@@ -27,7 +27,7 @@ describe('gesConnection', function() {
 
     //context('when calling subscription', ()=> {
     //    it('should stay open', function async (done) {
-    //        mut = bootstrap.getInstanceOf('gesConnection');
+    //        mut = bootstrap.getInstanceOf('gesConnection')();
     //        var rx = bootstrap.getInstanceOf('rx');
     //        var subscription = mut.subscribeToAllFrom();
     //

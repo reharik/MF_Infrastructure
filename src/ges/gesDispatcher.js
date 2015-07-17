@@ -2,8 +2,7 @@
  * Created by rharik on 6/18/15.
  */
 
-module.exports = function(config,
-                          invariant,
+module.exports = function(invariant,
                           _,
                           rx,
                           GesEvent,
@@ -54,7 +53,7 @@ module.exports = function(config,
         startDispatching() {
             logger.info('startDispatching called');
             //this.setMetadata();
-            var subscription = this.connection.subscribeToAllFrom();
+                var subscription = this.connection.subscribeToAllFrom();
             //var subscription = this.connection.subscribeToStreamFrom(this.options.stream);
 
             //Dispatcher gets raw events from ges in the EventData Form
@@ -63,9 +62,6 @@ module.exports = function(config,
             var relevantEvents = rx.Observable.fromEvent(subscription, 'event')
                 .filter(this.filterEvents, this)
                 .map(this.createGesEvent, this);
-            //console.log('relevantEvents');
-            //console.log(relevantEvents);
-            //relevantEvents.forEach(x=> console.log(x));
             relevantEvents.forEach(vent => this.serveEventToHandlers(vent,this.options.handlers),
                 error => { throw error; }
             );

@@ -1,5 +1,2 @@
 {
-  eventstore:{
-    ip:localhost
-  }
 }

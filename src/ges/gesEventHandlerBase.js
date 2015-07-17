@@ -2,7 +2,12 @@
  * Created by rharik on 6/18/15.
  */
 
-module.exports = function(NotificationEvent, appendToStreamPromise, expectIdempotence, EventData, logger) {
+module.exports = function(NotificationEvent,
+                          appendToStreamPromise,
+                          expectIdempotence,
+                          recordEventProcessed,
+                          EventData,
+                          logger) {
     return class gesEventHandler {
         constructor() {
             this.responseMessage;
@@ -25,6 +30,7 @@ module.exports = function(NotificationEvent, appendToStreamPromise, expectIdempo
                 this[gesEvent.eventTypeName](gesEvent);
                 
                 logger.trace('event Handled by: ' + gesEvent.eventTypeName + ' on ' + this.eventHandlerName);
+                recordEventProcessed(gesEvent);
 
             } catch (exception) {
                 logger.error('event: ' + JSON.stringify(gesEvent) + ' threw exception: ' + exception);
