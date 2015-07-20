@@ -3,6 +3,7 @@
  */
 
 require('must');
+var _ = require('lodash');
 
 describe('gesDispatcher', function() {
     var container;
@@ -18,8 +19,10 @@ describe('gesDispatcher', function() {
         container = require('../testBootstrap');
         GesEvent = container.getInstanceOf('GesEvent');
         gesConnection = container.getInstanceOf('gesConnection');
-        container.inject({name:'gesConnection', resolvedInstance:gesConnection.openConnection()});
-        gesConnection = container.getInstanceOf('gesConnection');
+        if(_.isFunction(gesConnection.openConnection)) {
+            container.inject({name: 'gesConnection', resolvedInstance: gesConnection.openConnection()});
+            gesConnection = container.getInstanceOf('gesConnection');
+        }
         mod = container.getInstanceOf('gesDispatcher');
         TestHandler = container.getInstanceOf('TestEventHandler');
         testHandler = new TestHandler();

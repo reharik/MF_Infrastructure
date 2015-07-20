@@ -6,13 +6,14 @@ var bootstrap = require('DAGon');
 module.exports = new bootstrap(x=>
     x.pathToRoot(__dirname)
         .requireDirectoryRecursively('./src')
-        .forDependencyParam('testAgg').requireThisInternalModule("/unitTests/mocks/testAgg")
-        .forDependencyParam('testAggNoCMDHandlers').requireThisInternalModule("/unitTests/mocks/testAggNoCMDHandlers")
-        .forDependencyParam('testAggNoEventHandlers').requireThisInternalModule("/unitTests/mocks/testAggNoEventHandlers")
-        .forDependencyParam('TestEventHandler').requireThisInternalModule("/unitTests/mocks/TestEventHandler")
-        .forDependencyParam('gesclient').requireThisInternalModule("/unitTests/mocks/gesClientMock")
-        .replace('lodash').withThis('_')
-        .replace('bluebird').withThis('Promise')
+        .for('gesConnection').callInitMethod('openConnection')
+        .for('testAgg').require("/unitTests/mocks/testAgg")
+        .for('testAggNoCMDHandlers').require("/unitTests/mocks/testAggNoCMDHandlers")
+        .for('testAggNoEventHandlers').require("/unitTests/mocks/testAggNoEventHandlers")
+        .for('TestEventHandler').require("/unitTests/mocks/TestEventHandler")
+        .for('gesclient').require("/unitTests/mocks/gesClientMock")
+        .rename('lodash').withThis('_')
+        .rename('bluebird').withThis('Promise')
         .complete());
 
 

@@ -6,9 +6,10 @@ console.log(__dirname);
 module.exports =  new container(x=>
         x.pathToRoot(__dirname)
             .requireDirectoryRecursively('./src')
-            .replace('lodash').withThis('_')
-            .replace('bluebird').withThis('Promise')
-            .forDependencyParam('TestAgg').requireThisInternalModule("/unitTests/mocks/testAgg")
-            .forDependencyParam('TestEventHandler').requireThisInternalModule("/unitTests/mocks/TestEventHandler")
-            .forDependencyParam('NotificationHandler').requireThisInternalModule("/unitTests/mocks/NotificationHandler")
+            .callInitMethod({method:'openConnection'})
+            .rename('lodash').withThis('_')
+            .rename('bluebird').withThis('Promise')
+            .for('TestAgg').require("/unitTests/mocks/testAgg")
+            .for('TestEventHandler').require("/unitTests/mocks/TestEventHandler")
+            .for('NotificationHandler').require("/unitTests/mocks/NotificationHandler")
             .complete());

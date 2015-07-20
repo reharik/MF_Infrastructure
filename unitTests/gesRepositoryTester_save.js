@@ -3,6 +3,8 @@
  */
 
 require('must');
+var _ = require('lodash');
+
 var container;
 
 
@@ -21,11 +23,13 @@ describe('getEventStoreRepository', function() {
     before(function(){
         container = require('../testBootstrap');
         gesConnection = container.getInstanceOf('gesConnection');
-        //console.log('gesConnection1');
-        //console.log(gesConnection);
-        //
-        //container.inject({name:'gesConnection', resolvedInstance:gesConnection.openConnection()});
-        //gesConnection = container.getInstanceOf('gesConnection');
+        if(_.isFunction(gesConnection.openConnection)) {
+            var openConnection = gesConnection.openConnection();
+            container.inject({name: 'gesConnection', resolvedInstance: openConnection});
+            gesConnection = container.getInstanceOf('gesConnection');
+        }
+
+
         streamNameStrategy = container.getInstanceOf('streamNameStrategy');
 
         uuid = container.getInstanceOf('uuid');

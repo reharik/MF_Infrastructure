@@ -3,6 +3,7 @@
 // */
 //
 var demand = require('must');
+var _ = require('lodash');
 
 describe('gesEventHandlerBase', function() {
     var mut;
@@ -15,6 +16,11 @@ describe('gesEventHandlerBase', function() {
 
     before(function(){
         container = require('../testBootstrap');
+        var gesConnection = container.getInstanceOf('gesConnection');
+        if(_.isFunction(gesConnection.openConnection)) {
+            container.inject({name: 'gesConnection', resolvedInstance: gesConnection.openConnection()});
+            gesConnection = container.getInstanceOf('gesConnection');
+        }
         TestHandler = container.getInstanceOf('TestEventHandler');
         GesEvent = container.getInstanceOf('GesEvent');
         uuid = container.getInstanceOf('uuid');
@@ -35,7 +41,6 @@ describe('gesEventHandlerBase', function() {
         });
         context('when calling handler that throws an exception', function () {
             it('should not process event', async function () {
-                container.inject({name:'expectIdempotence', resolvedInstance:expectIdempotence(false)});
                 TestHandler = container.getInstanceOf('TestEventHandler');
                 mut = new TestHandler();
 
@@ -47,7 +52,14 @@ describe('gesEventHandlerBase', function() {
 
         context('when calling handler that throws an exception and notification on', function () {
             it('should send proper notification event', async function () {
-                container.inject({name:'expectIdempotence', resolvedInstance:expectIdempotence(true)});
+                var ges;
+                var gesConnection = container.getInstanceOf('gesConnection');
+                if(_.isFunction(gesConnection.openConnection)) {
+                    ges = {name: 'gesConnection', resolvedInstance: gesConnection.openConnection()};
+                    container.inject([{name:'expectIdempotence', resolvedInstance:expectIdempotence(true)},ges]);
+                }else {
+                    container.inject([{name: 'expectIdempotence', resolvedInstance: expectIdempotence(true)}]);
+                }
                 TestHandler = container.getInstanceOf('TestEventHandler');
                 mut = new TestHandler();
 
@@ -59,7 +71,6 @@ describe('gesEventHandlerBase', function() {
 
         context('when calling handler that throws an exception and notification OFF', function () {
             it('should not send notification event', async function () {
-                container.inject({name:'expectIdempotence', resolvedInstance:expectIdempotence(true)});
                 TestHandler = container.getInstanceOf('TestEventHandler');
                 mut = new TestHandler();
 
@@ -72,7 +83,6 @@ describe('gesEventHandlerBase', function() {
 
         context('when calling handler that DOES NOT throw an exception and notification ON', function () {
             it('should send proper notification event', async function () {
-                container.inject({name:'expectIdempotence', resolvedInstance:expectIdempotence(true)});
                 TestHandler = container.getInstanceOf('TestEventHandler');
                 mut = new TestHandler();
 
@@ -84,7 +94,6 @@ describe('gesEventHandlerBase', function() {
 
         context('when calling handler that DOES NOT throw an exception and notification OFF', function () {
             it('should send proper notification event', async function () {
-                container.inject({name:'expectIdempotence', resolvedInstance:expectIdempotence(true)});
                 TestHandler = container.getInstanceOf('TestEventHandler');
                 mut = new TestHandler();
 
@@ -97,7 +106,6 @@ describe('gesEventHandlerBase', function() {
 
         context('when calling handler that DOES NOT throws an exception', function () {
             it('should process event', async function () {
-                container.inject({name:'expectIdempotence', resolvedInstance:expectIdempotence(true)});
                 var eventData =new GesEvent('someEventNotificationOff',{'some':'data'},{eventTypeName:'someEventNotificationOff'});
                 TestHandler = container.getInstanceOf('TestEventHandler');
                 mut = new TestHandler();
@@ -108,7 +116,6 @@ describe('gesEventHandlerBase', function() {
         });
         context('when calling handler is successful', function () {
             it('should have proper properties on notification event', async function () {
-                container.inject({name:'expectIdempotence', resolvedInstance:expectIdempotence(true)});
                 TestHandler = container.getInstanceOf('TestEventHandler');
                 mut = new TestHandler();
                 var continuationId = uuid.v1();

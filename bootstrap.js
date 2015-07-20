@@ -20,8 +20,8 @@ module.exports =  function() {
     var rootRegistry = x=>
         x.pathToRoot(__dirname)
             .requireDirectoryRecursively('./src')
-            .replace('lodash').withThis('_')
-            .replace('bluebird').withThis('Promise')
+            .rename('lodash').withThis('_')
+            .rename('bluebird').withThis('Promise')
             .complete();
 
     var registries = [rootRegistry];

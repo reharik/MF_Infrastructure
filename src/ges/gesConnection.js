@@ -3,7 +3,7 @@
 module.exports = function(gesclient, config, logger) {
 
     return {
-        openConnection(){
+        openConnection: function(){
             var connection;
             logger.trace('accessing gesConnection');
             if (!connection) {
