@@ -18,6 +18,8 @@ describe('gesDispatcher', function() {
         container = require('../testBootstrap');
         GesEvent = container.getInstanceOf('GesEvent');
         gesConnection = container.getInstanceOf('gesConnection');
+        container.inject({name:'gesConnection', resolvedInstance:gesConnection.openConnection()});
+        gesConnection = container.getInstanceOf('gesConnection');
         mod = container.getInstanceOf('gesDispatcher');
         TestHandler = container.getInstanceOf('TestEventHandler');
         testHandler = new TestHandler();
@@ -57,12 +59,7 @@ describe('gesDispatcher', function() {
             it('should handle event',  function () {
                 mut.startDispatching();
 
-                console.log("testing connections");
-                console.log(gesConnection.getId());
-                console.log(mut.getConn().getId());
-
                 var subscription = gesConnection.getSubscription();
-                console.log(subscription);
                 var eventData = {
                     Event:{EventType:'someEventNotificationOn'},
                     OriginalPosition:{},
@@ -106,8 +103,6 @@ describe('gesDispatcher', function() {
                 };
                 subscription.emit('event', eventData);
                 var eventsHandled = testHandler.eventsHandled[0];
-                console.log('eventsHandledXXXXXXXXXXXXXXXXX');
-                console.log(eventsHandled);
                 eventsHandled.eventTypeName.must.equal('someEventNotificationOn');
                 eventsHandled.originalPosition.must.equal('the originalPosition');
                 eventsHandled.metadata.eventTypeName.must.equal('someEventNotificationOn');

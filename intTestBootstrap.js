@@ -1,10 +1,11 @@
 /**
  * Created by rharik on 6/23/15.
  */
-var container = require('./node_modules/dependz/index');
+var container = require('DAGon');
 console.log(__dirname);
 module.exports =  new container(x=>
         x.pathToRoot(__dirname)
+            .requireDirectoryRecursively('./src')
             .replace('lodash').withThis('_')
             .replace('bluebird').withThis('Promise')
             .forDependencyParam('TestAgg').requireThisInternalModule("/unitTests/mocks/testAgg")

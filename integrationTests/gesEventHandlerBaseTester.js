@@ -48,8 +48,6 @@ describe('gesEventHandlerBaseTester', function() {
             setTimeout(()=>{
                 notificationHandler.eventsHandled.length.must.be.at.least(1);
                 demand(notificationHandler.eventsHandled.find(x=>x.eventTypeName != 'notificationEvent')).be.undefined();
-                console.log(continuationId);
-                console.log(notificationHandler.eventsHandled.filter(x=>x.metadata.continuationId== continuationId ));
                 notificationHandler.eventsHandled.filter(x=>x.metadata.continuationId == continuationId).length.must.be.at.least(1);
                 notificationHandler.eventsHandled.filter(x=>x.metadata.continuationId == continuationId)[0].data.notificationType.must.equal('Success');
 
@@ -68,8 +66,6 @@ describe('gesEventHandlerBaseTester', function() {
             setTimeout(()=>{
                 notificationHandler.eventsHandled.length.must.be.at.least(1);
                 demand(notificationHandler.eventsHandled.find(x=>x.eventTypeName != 'notificationEvent')).be.undefined();
-                console.log(continuationId);
-                console.log(notificationHandler.eventsHandled.filter(x=>x.metadata.continuationId== continuationId ));
                 notificationHandler.eventsHandled.filter(x=>x.metadata.continuationId == continuationId).length.must.be.at.least(1);
                 notificationHandler.eventsHandled.filter(x=>x.metadata.continuationId == continuationId)[0].data.notificationType.must.equal('Failure');
                 done();

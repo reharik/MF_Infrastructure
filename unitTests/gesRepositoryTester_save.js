@@ -20,8 +20,14 @@ describe('getEventStoreRepository', function() {
 
     before(function(){
         container = require('../testBootstrap');
-        streamNameStrategy = container.getInstanceOf('streamNameStrategy');
         gesConnection = container.getInstanceOf('gesConnection');
+        //console.log('gesConnection1');
+        //console.log(gesConnection);
+        //
+        //container.inject({name:'gesConnection', resolvedInstance:gesConnection.openConnection()});
+        //gesConnection = container.getInstanceOf('gesConnection');
+        streamNameStrategy = container.getInstanceOf('streamNameStrategy');
+
         uuid = container.getInstanceOf('uuid');
         TestAgg = container.getInstanceOf('testAgg');
         GesEvent = container.getInstanceOf('GesEvent');

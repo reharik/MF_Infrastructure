@@ -3,13 +3,26 @@
  */
 'use strict';
 
-var container = require('./node_modules/dependz/index');
+var container = require('DAGon');
 
-module.exports = function (optionalRegistry) {
+//
+//module.exports =  function(optionalRegistry) {
+//    var rootRegistry = x=>
+//        x.pathToRoot(__dirname)
+//            .requireDirectoryRecursively('./src')
+//            .replace('lodash').withThis('_')
+//            .replace('bluebird').withThis('Promise')
+//            .complete();
+//
+//    var registries = [rootRegistry, optionalRegistry];
+//    return new container(registries);
+//};
+
+module.exports = function () {
     var rootRegistry = function rootRegistry(x) {
-        return x.pathToRoot(__dirname).replace('lodash').withThis('_').replace('bluebird').withThis('Promise').makeThisDependencyASingleton('gesConnection').complete();
+        return x.pathToRoot(__dirname).requireDirectoryRecursively('./src').replace('lodash').withThis('_').replace('bluebird').withThis('Promise').complete();
     };
 
-    var registries = [rootRegistry, optionalRegistry];
+    var registries = [rootRegistry];
     return new container(registries);
 };

@@ -19,7 +19,6 @@ describe('aggregateFunctionality', function() {
     });
 
     beforeEach(function(){
-        console.log(testAgg);
         mut = new testAgg();
     });
 

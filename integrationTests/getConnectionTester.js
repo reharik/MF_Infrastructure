@@ -18,8 +18,7 @@ describe('gesConnection', function() {
 
     context('passing proper args', ()=> {
         it('should should return a connection', function () {
-            mut = bootstrap.getInstanceOf('gesConnection')();
-            console.log(mut);
+            mut = bootstrap.getInstanceOf('gesConnection');
             mut.must.not.be.null();
             mut._handler._connectingPhase.must.equal('Connected');
         })

@@ -8,7 +8,7 @@ var _createClass = (function () { function defineProperties(target, props) { for
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-module.exports = function (NotificationEvent, appendToStreamPromise, expectIdempotence, EventData, logger) {
+module.exports = function (NotificationEvent, appendToStreamPromise, expectIdempotence, recordEventProcessed, EventData, logger) {
     return (function () {
         function gesEventHandler() {
             _classCallCheck(this, gesEventHandler);
@@ -35,6 +35,7 @@ module.exports = function (NotificationEvent, appendToStreamPromise, expectIdemp
                     this[gesEvent.eventTypeName](gesEvent);
 
                     logger.trace('event Handled by: ' + gesEvent.eventTypeName + ' on ' + this.eventHandlerName);
+                    recordEventProcessed(gesEvent);
                 } catch (exception) {
                     logger.error('event: ' + JSON.stringify(gesEvent) + ' threw exception: ' + exception);
                     if (this.responseMessage) {

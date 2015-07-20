@@ -4,12 +4,11 @@
 
 var bootstrap = require('./bootstrap');
 var invariant = require('invariant');
-module.exports = function() {
-    return function (options) {
-        invariant(options.registry,
-        "You must provide a dependz registry for such items as logger, idempotency, and streamName Strategies");
-        var container = bootstrap(options.registry);
-        return {
+    //return function (options) {
+    //    invariant(options.registry,
+    //    "You must provide a DAGon registry for such items as logger, idempotency, and streamName Strategies");
+        var container = bootstrap();
+        var DDD = {
             gesConnection: container.getInstanceOf('gesConnection'),
             gesDispatcher: container.getInstanceOf('gesDispatcher'),
             gesEventHandlerBase: container.getInstanceOf('gesEventHandlerBase'),
@@ -21,5 +20,5 @@ module.exports = function() {
             GesEvent: container.getInstanceOf('GesEvent'),
             NotificationEvent: container.getInstanceOf('NotificationEvent')
         };
-    }
-};
+    //}
+module.exports = DDD;

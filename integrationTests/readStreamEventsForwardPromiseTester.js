@@ -48,7 +48,6 @@ describe('readStreamEventsForwardPromiseTester', function() {
             var results = await mut('readStream', {start: 0, count: 10});
             results.Status.must.equal('Success');
             results.Events.length.must.be.at.most(10);
-            console.log(results.Events);
         });
     });
 });

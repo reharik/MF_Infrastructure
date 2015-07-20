@@ -53,8 +53,6 @@ describe('gesEventHandlerBase', function() {
 
                 var eventData =new GesEvent('someExceptionNotificationOn',{'some':'data'},{eventTypeName:'someExceptionNotificationOn'});
                 var result = await mut.handleEvent(eventData);
-                console.log('JSON.parse(result.data.events[0]');
-                console.log(result.data.events);
                 JSON.parse(result.data.events[0].Data).notificationType.must.equal('Failure');
             })
         });
