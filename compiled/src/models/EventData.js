@@ -2,13 +2,11 @@
  * Created by rharik on 6/12/15.
  */
 
-"use strict";
-
-module.exports = function (uuid) {
+module.exports = function(uuid) {
     return function EventData(eventTypeName, data, metadata) {
         metadata = metadata || {};
         data = JSON.stringify(data || {});
-        metadata = metadata || {};
+        metadata = metadata||{};
         metadata.eventTypeName = eventTypeName;
         metadata = JSON.stringify(metadata);
 
