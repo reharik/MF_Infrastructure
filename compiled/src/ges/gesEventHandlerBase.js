@@ -4,8 +4,7 @@
 
 module.exports = function(NotificationEvent,
                           appendToStreamPromise,
-                          expectIdempotence,
-                          recordEventProcessed,
+                          readModelRepository,
                           EventData,
                           logger) {
     return class gesEventHandler {
@@ -19,7 +18,7 @@ module.exports = function(NotificationEvent,
 
         handleEvent(gesEvent) {
             logger.debug('checking event for idempotence');
-            if (!expectIdempotence(gesEvent)) {
+            if (!readModelRepository.expectIdempotence(gesEvent.originalPosition, this.eventHandlerName)) {
                 return;
             }
             logger.trace('event idempotent');
@@ -28,9 +27,9 @@ module.exports = function(NotificationEvent,
                 logger.info('calling specific event handler for: ' + gesEvent.eventTypeName + ' on ' + this.eventHandlerName);
 
                 this[gesEvent.eventTypeName](gesEvent);
-                
+
                 logger.trace('event Handled by: ' + gesEvent.eventTypeName + ' on ' + this.eventHandlerName);
-                recordEventProcessed(gesEvent);
+                readModelRepository.recordEventProcessed(gesEvent);
 
             } catch (exception) {
                 logger.error('event: ' + JSON.stringify(gesEvent) + ' threw exception: ' + exception);
@@ -45,7 +44,7 @@ module.exports = function(NotificationEvent,
                         this.responseMessage.eventTypeName,
                         this.responseMessage.data,
                         {"continuationId": this.continuationId,
-                        "eventTypeName":"notificationEvent"});
+                            "eventTypeName":"notificationEvent"});
 
                     logger.debug('response event created: ' + JSON.stringify(responseEvent));
 
