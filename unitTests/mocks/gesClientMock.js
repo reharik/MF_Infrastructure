@@ -3,8 +3,7 @@
  */
 
 
-module.exports = function(uuid) {
-    var Subscription = require('./SubscriptionMock');
+module.exports = function(uuid, SubscriptionMock) {
 
     return function gesClientMock(opts) {
         var subscription;
@@ -23,19 +22,19 @@ module.exports = function(uuid) {
 
         var subscribeToStream = function () {
             console.log('mock stream subscription');
-            subscription = new Subscription();
+            subscription = new SubscriptionMock();
             return subscription;
         };
 
         var subscribeToStreamFrom = function () {
             console.log('mock stream subscription');
-            subscription = new Subscription();
+            subscription = new SubscriptionMock();
             return subscription;
         };
 
         var subscribeToAllFrom = function () {
             console.log('mock stream subscription');
-            subscription = new Subscription();
+            subscription = new SubscriptionMock();
             return subscription;
         };
 

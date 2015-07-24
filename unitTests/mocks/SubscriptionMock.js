@@ -6,8 +6,10 @@ var EventEmitter = require('events').EventEmitter;
 var util = require('util');
 
 
-module.exports = class SubscriptionMock extends EventEmitter {
-    constructor(){
-        super();
-    }
+module.exports = function() {
+    return class SubscriptionMock extends EventEmitter {
+        constructor() {
+            super();
+        }
+    };
 };

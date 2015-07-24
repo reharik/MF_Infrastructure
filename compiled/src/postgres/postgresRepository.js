@@ -2,13 +2,13 @@
  * Created by parallels on 7/22/15.
  */
 
-module.exports = function(pgbluebird, config, logger){
+module.exports = function(pgbluebird, config, uuid, logger){
     return {
-         getById(id,table){
+        getById(id,table){
             var pgb = new pgbluebird();
             var cnn;
 
-            pgb.connect(config.get('postgress.connectionString'))
+            pgb.connect(config.get('postgress'))
                 .then(function (connection) {
                     cnn = connection;
                     return cnn.client.query("SELECT * from "+table+" where Id = "+id);
@@ -25,7 +25,7 @@ module.exports = function(pgbluebird, config, logger){
                 });
         },
 
-        save(document, id){
+        save(table, document, id){
             var pgb = new pgbluebird();
             var cnn;
 
@@ -35,7 +35,7 @@ module.exports = function(pgbluebird, config, logger){
                     if(id){
                         return cnn.client.query("UPDATE "+table+" SET document = "+document+" where Id = "+id);
                     }else{
-                        return cnn.client.query("INSERT INTO "+table+" (id, document) VALUES ("+id+","+document+")");
+                        return cnn.client.query("INSERT INTO "+table+" (id, document) VALUES ("+uuid.v4()+","+document+")");
                     }
                 })
                 .then(function (result) {
@@ -51,12 +51,13 @@ module.exports = function(pgbluebird, config, logger){
         isIdempotent(originalPosition, eventHandlerName){
             var pgb = new pgbluebird();
             var cnn;
-
-            pgb.connect(config.get('postgress.connectionString'))
+            console.log("config.get('postgress')xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+            console.log(config);
+            pgb.connect(config.get('postgres.connectionString'))
                 .then(function (connection) {
                     cnn = connection;
                     logger.info('getting last processed postion for eventHandler ' + eventHandlerName);
-                    return cnn.client.query("SELECT * from LastProcessedPosition where handlerType = eventHandlerName");
+                    return cnn.client.query("SELECT * from lastProcessedPosition where handlerType = eventHandlerName");
                 })
                 .then(function (result) {
                     var row = result.rows;
@@ -87,7 +88,9 @@ module.exports = function(pgbluebird, config, logger){
                     logger.trace('setting last process position for eventHandler ' + eventHandlerName +': '+originalPosition.commitPosition);
 
                     cnn.client.query("UPDATE lastProcessPosition " +
-                        "SET commitPosition = "+originalPosition.CommitPosition+", preparePosition = "+originalPosition.PreparePosition+"" +
+                        "SET commitPosition = "+originalPosition.CommitPosition +
+                        ", preparePosition = "+originalPosition.PreparePosition +
+                        ", eventHandler = "+eventHandlerName +
                         "WHERE Id = "+row.Id);
                 })
                 .then(function (result) {

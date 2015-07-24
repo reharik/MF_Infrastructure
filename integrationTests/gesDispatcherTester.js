@@ -38,6 +38,7 @@ describe('gesDispatcher', function() {
     context('when calling gesDispatcher', ()=> {
         it('should retrieve events', (done)=> {
             setTimeout(()=>{
+                console.log(testEventHandler.eventsHandled);
                 testEventHandler.eventsHandled.length.must.be.at.least(1);
                 testEventHandler.eventsHandled.find(x=>x.eventTypeName == 'testingEventNotificationOn').must.exist();
                 done();

@@ -18,7 +18,7 @@ module.exports = function(NotificationEvent,
 
         handleEvent(gesEvent) {
             logger.debug('checking event for idempotence');
-            if (!readModelRepository.expectIdempotence(gesEvent.originalPosition, this.eventHandlerName)) {
+            if (!readModelRepository.isIdempotent(gesEvent.originalPosition, this.eventHandlerName)) {
                 return;
             }
             logger.trace('event idempotent');

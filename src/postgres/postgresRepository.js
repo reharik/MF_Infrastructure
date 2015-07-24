@@ -4,11 +4,11 @@
 
 module.exports = function(pgbluebird, config, uuid, logger){
     return {
-         getById(id,table){
+        getById(id,table){
             var pgb = new pgbluebird();
             var cnn;
 
-            pgb.connect(config.get('postgress.connectionString'))
+            pgb.connect(config.get('postgress'))
                 .then(function (connection) {
                     cnn = connection;
                     return cnn.client.query("SELECT * from "+table+" where Id = "+id);
@@ -51,8 +51,9 @@ module.exports = function(pgbluebird, config, uuid, logger){
         isIdempotent(originalPosition, eventHandlerName){
             var pgb = new pgbluebird();
             var cnn;
-
-            pgb.connect(config.get('postgress.connectionString'))
+            console.log("config.get('postgress')xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+            console.log(config);
+            pgb.connect(config.get('postgres.connectionString'))
                 .then(function (connection) {
                     cnn = connection;
                     logger.info('getting last processed postion for eventHandler ' + eventHandlerName);
