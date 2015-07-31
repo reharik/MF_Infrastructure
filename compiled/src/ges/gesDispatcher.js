@@ -27,28 +27,6 @@ module.exports = function(invariant,
             );
         }
 
-        getConn(){
-            return this.connection;
-        }
-
-        //TODO this will go in the app setup
-        setMetadata() {
-            var setData = {
-                expectedMetastreamVersion: -1
-                , metadata: gesclient.createStreamMetadata({
-                    acl: {
-                        readRoles: gesclient.systemRoles.all
-                    }
-                })
-                , auth: {
-                    username: gesclient.systemUsers.admin
-                    , password: gesclient.systemUsers.defaultAdminPassword
-                }
-            };
-
-            gesConnection.setStreamMetadata('$all', setData)
-        }
-
         startDispatching() {
             logger.info('startDispatching called');
             //this.setMetadata();
