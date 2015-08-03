@@ -8,7 +8,7 @@ module.exports = function(pgbluebird, config, uuid, logger){
             var pgb = new pgbluebird();
             var cnn;
 
-            pgb.connect(config.get('postgress'))
+            pgb.connect(config.get('postgres.connectionString') + config.get('postgres.methodFitness'))
                 .then(function (connection) {
                     cnn = connection;
                     return cnn.client.query("SELECT * from "+table+" where Id = "+id);
@@ -29,7 +29,7 @@ module.exports = function(pgbluebird, config, uuid, logger){
             var pgb = new pgbluebird();
             var cnn;
 
-            pgb.connect(config.get('postgress.connectionString'))
+            pgb.connect(config.get('postgres.connectionString') + config.get('postgres.methodFitness'))
                 .then(function (connection) {
                     cnn = connection;
                     if(id){
@@ -51,13 +51,11 @@ module.exports = function(pgbluebird, config, uuid, logger){
         isIdempotent(originalPosition, eventHandlerName){
             var pgb = new pgbluebird();
             var cnn;
-            console.log("config.get('postgress')xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-            console.log(config);
-            pgb.connect(config.get('postgres.connectionString'))
+            pgb.connect(config.get('postgres.connectionString') + config.get('postgres.methodFitness'))
                 .then(function (connection) {
                     cnn = connection;
                     logger.info('getting last processed postion for eventHandler ' + eventHandlerName);
-                    return cnn.client.query("SELECT * from lastProcessedPosition where handlerType = eventHandlerName");
+                    return cnn.client.query("SELECT * from lastProcessedPosition where handlerType = "+ eventHandlerName);
                 })
                 .then(function (result) {
                     var row = result.rows;
@@ -82,7 +80,7 @@ module.exports = function(pgbluebird, config, uuid, logger){
                 throw new Error("ResolvedEvent didn't come off a subscription at all (has no position).");
             }
 
-            pgb.connect(config.get('postgress.connectionString'))
+            pgb.connect(config.get('postgres.connectionString') + config.get('postgres.methodFitness'))
                 .then(function (connection) {
                     cnn = connection;
                     logger.trace('setting last process position for eventHandler ' + eventHandlerName +': '+originalPosition.commitPosition);
