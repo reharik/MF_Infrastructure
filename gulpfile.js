@@ -16,7 +16,7 @@ gulp.task('clean', function (cb) {
 
 
 gulp.task('publish',['clean'], function () {
-    gulp.src(['src/**/*'], { "base" : "." }).pipe(gulp.dest('compiled'));
+    gulp.src(['src/**/*'], { "base" : "." }).pipe(gulp.dest('output'));
 });
 
 gulp.task('default', ['clean','publish']);
