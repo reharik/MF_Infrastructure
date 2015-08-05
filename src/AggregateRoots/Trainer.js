@@ -18,7 +18,7 @@ module.exports = function(AggregateRootBase, GesEvent, uuid, invariant) {
         commandHandlers() {
             return {
                 'hireTrainer': function (cmd) {
-                    this.raiseEvent(new GesEvent('trainerHired',{credentials:cmd.credentials, contact:cmd.contact, address:cmd.address, dob:cmd.dob}));
+                    this.raiseEvent(new GesEvent('trainerHired',{id: uuid.v4(), credentials:cmd.credentials, contact:cmd.contact, address:cmd.address, dob:cmd.dob}));
                 },
                 'loginTrainer': function (cmd) {
                     expectNotLoggedIn();
