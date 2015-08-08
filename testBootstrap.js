@@ -1,7 +1,7 @@
 /**
  * Created by rharik on 6/23/15.
  */
-var bootstrap = require('DAGon');
+var bootstrap = require('dagon');
 
 module.exports = new bootstrap(x=>
     x.pathToRoot(__dirname)
