@@ -17,6 +17,7 @@ describe('gesDispatcher', function() {
 
     before(function(){
         container = require('../testBootstrap');
+        console.log(container);
         GesEvent = container.getInstanceOf('GesEvent');
         gesConnection = container.getInstanceOf('gesConnection');
         if(_.isFunction(gesConnection.openConnection)) {

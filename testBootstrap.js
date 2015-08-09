@@ -2,11 +2,10 @@
  * Created by rharik on 6/23/15.
  */
 var bootstrap = require('dagon');
-
 module.exports = new bootstrap(x=>
     x.pathToRoot(__dirname)
         .requireDirectoryRecursively('./src')
-        .for('gesConnection').instantiate(x=>x.initializeWithMethod('openConnection'))
+        .for('gesConnection').instantiate(i=> i.initializeWithMethod('openConnection'))
         .for('SubscriptionMock').require("/unitTests/mocks/SubscriptionMock")
         .for('testAgg').require("/unitTests/mocks/testAgg")
         .for('testAggNoCMDHandlers').require("/unitTests/mocks/testAggNoCMDHandlers")
