@@ -68,7 +68,7 @@ describe('gesDispatcher', function() {
                     Event:{EventType:'someEventNotificationOn'},
                     OriginalPosition:{},
                     OriginalEvent:{
-                        Metadata:{eventTypeName:'someEventNotificationOn'},
+                        Metadata:{eventTypeName:'eventTypeName'},
                         Data:{'some':'data'}
                     }
 

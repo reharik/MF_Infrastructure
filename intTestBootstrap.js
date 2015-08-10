@@ -1,7 +1,7 @@
 /**
  * Created by rharik on 6/23/15.
  */
-var container = require('DAGon');
+var container = require('dagon');
 console.log(__dirname);
 module.exports =  new container(x=>
     x.pathToRoot(__dirname)

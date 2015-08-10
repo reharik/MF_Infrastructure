@@ -1,8 +1,12 @@
 {
   "eventstore":{
-    "ip":"172.0.0.1"
+    "host":"eventstore",
+    "systemUsers": {"admin":"admin"},
+    "adminPassword":"changeit"
   },
   "postgres":{
-    "connectionString":"postgres://postgres:password@172.17.0.5/MethodFitness"
+    "connectionString":"postgres://postgres:password@postgres/",
+    "postgres":"postgres",
+    "methodFitness":"MethodFitness"
   }
 }

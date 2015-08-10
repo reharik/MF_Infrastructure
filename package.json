@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "main": "index.js",
   "scripts": {
-    "start": "gulp dev",
+    "start": "babel-node --harmony server.js --stage 0",
     "test": "mocha --opts unitTests/mocha.opts unitTests",
     "testSpecific": "mocha --opts unitTests/mocha.opts ",
     "testDebug": "node-debug _mocha --timeout 15000 --opts unitTests/mocha.opts unitTests",
@@ -16,7 +16,7 @@
     "JSON": "^1.0.0",
     "bluebird": "^2.9.27",
     "config": "^1.14.0",
-    "dagon": "0.0.6",
+    "dagon": "0.0.8",
     "ges-client": "^0.9.1",
     "invariant": "^2.1.0",
     "lodash": "^3.9.3",
