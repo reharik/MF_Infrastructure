@@ -16,7 +16,7 @@
     "JSON": "^1.0.0",
     "bluebird": "^2.9.27",
     "config": "^1.14.0",
-    "dagon": "0.0.8",
+    "dagon": "0.0.9",
     "ges-client": "^0.9.1",
     "invariant": "^2.1.0",
     "lodash": "^3.9.3",

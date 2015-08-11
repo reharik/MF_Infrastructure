@@ -10,7 +10,7 @@ var del = require('del');
 
 gulp.task('clean', function (cb) {
     del([
-        'compiled/**/*'
+        'output/**/*'
     ], cb);
 });
 
