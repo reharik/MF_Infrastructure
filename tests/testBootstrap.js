@@ -3,7 +3,7 @@
  */
 var bootstrap = require('dagon');
 module.exports = new bootstrap(x=>
-    x.pathToRoot(__dirname)
+    x.pathToRoot(__dirname + '../')
         .requireDirectoryRecursively('./src')
         .for('gesConnection').instantiate(i=> i.initializeWithMethod('openConnection'))
         .for('logger').require("/unitTests/mocks/logger")
