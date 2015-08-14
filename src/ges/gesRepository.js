@@ -133,7 +133,6 @@ module.exports = function(invariant,
                 // add extra data to metadata portion of persisted event
                 _.assign(metadata, _metadata);
                 logger.debug('merged metadata: ' + metadata);
-
                 logger.debug('gesRepo calling save with params:' + aggregate + ', ' + metadata.commitIdHeader+ ', ' + _metadata);
 
                 streamName = streamNameStrategy(aggregate.constructor.name, aggregate._id);
