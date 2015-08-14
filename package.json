@@ -1,9 +1,8 @@
 {
-  "name": "MF_Infrastructure",
+  "name": "core",
   "version": "0.0.1",
   "main": "index.js",
   "scripts": {
-    "start": "babel-node --harmony server.js --stage 0",
     "test": "mocha --opts tests/mocha.opts tests/unitTests",
     "testSpecific": "mocha --opts tests/mocha.opts ",
     "testDebug": "node-debug _mocha --timeout 15000 --opts tests/mocha.opts unitTests",
